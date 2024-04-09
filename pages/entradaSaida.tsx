@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-// kkkkkk
+// kkkkkkkkk
 const EntradasSaidas = () => {
   const { colorMode } = useColorMode();
 
