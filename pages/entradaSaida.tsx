@@ -61,10 +61,27 @@ const EntradasSaidas = () => {
               totalParcelasBaseDados: item2.totalParcelasBaseDados,
               createdAt: item2.createdAt,
             });
+            if (item2.tipoLancamento === "Saída") {
+              totalInvest +=
+                ((parseFloat(item2.totalEmprestimo) +
+                  (parseFloat(item.jurosEmprestimo) / 100) *
+                    parseFloat(item2.totalEmprestimo)) /
+                  parseFloat(item2.totalParcelasBaseDados)) *
+                parseFloat(item2.totalParcelas);
+            } else {
+              totalAReceberV +=
+                ((parseFloat(item2.totalEmprestimo) +
+                  (parseFloat(item.jurosEmprestimo) / 100) *
+                    parseFloat(item2.totalEmprestimo)) /
+                  parseFloat(item2.totalParcelasBaseDados)) *
+                parseFloat(item2.totalParcelas);
+            }
           }
         });
       });
       setEntradasSaidasLista(listaVolatel);
+      setTotalEmprestado(totalInvest);
+      setTotalRecebido(totalAReceberV);
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);

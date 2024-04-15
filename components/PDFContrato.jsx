@@ -69,7 +69,7 @@ async function PDFContrato({
   const details = [
     {
       image: imagemVarivel,
-      width: 50,
+      width: 60,
       height: 50,
       alignment: "center",
     },
@@ -98,9 +98,9 @@ async function PDFContrato({
           fontSize: 12,
           bold: true,
         },
-        " neste acto representado polo gestor Administrativo ",
+        " neste acto representado polo Gestor Administrativo ",
         { text: "Dércio Zefanias Valoi, ", fontSize: 12, bold: true },
-        "de nacionalidade moçambicana, solteiro, com o NUIT número 110870663, residente na Cidade de Maputo, distrito urbano de KaMubucuana, Bairro do Jardim, Quarteirão número 03, Casa número 34",
+        "de nacionalidade moçambicana, solteiro, com o Bilhete de Identidade número 110100534002S, com o NUIT número 110870663, residente na Cidade de Maputo, distrito urbano de KaLhamanculo, Unidade - 7, Quarteirão número 16, Casa número 2039",
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -121,7 +121,7 @@ async function PDFContrato({
     {
       text: [
         { text: `MUTUÁRIO: ${nomeCompleto},`, fontSize: 12, bold: true },
-        ` de nacionalidade moçambicana, ${estadoCivil}, com o Bilhete de Identidade número ${bI}, NUIT ${nUIT}, `,
+        ` de nacionalidade moçambicana, ${estadoCivil}, com o Bilhete de Identidade número ${bI}, com o NUIT número ${nUIT}, `,
         `residente em ${endereco} , distrito urbano de ${distrito}, Bairro ${bairro}, Quarteirão número ${numeroQuarteirao}, Casa número ${numeroCasa}, `,
         `tendo como fonte de rendimento ${fonteRendimento}, contactável pelo(s) número(s) ${contacto}, `,
       ],
