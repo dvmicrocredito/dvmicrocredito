@@ -32,18 +32,88 @@ const Lancamentos = () => {
   const { data: session } = useSession();
   const [emprestimoLista, setEmprestimoLista] = useState<any[]>([]);
   const [totalInvestido, setTotalInvestido] = useState(0);
+  const [totalAReceber, setTotalAReceber] = useState(0);
+  const [totalProvJuros, setTotalProvJuros] = useState(0);
+  const [totalAtraso, setTotalAtraso] = useState(0);
+  const [totalRecPrincipal, setTotalRecPrincipal] = useState(0);
+  const [totalRecJuros, setTotalRecJuros] = useState(0);
   var totalInvest = 0;
+  var totalAReceberV = 0;
+  var totalProvJurosV = 0;
+  var totalAtrasoV = 0;
+  var recPrincipalV = 0;
+  var recPrincipalJurosV = 0;
+  var listaVolatel: any = [];
+  var listaVolatelNomes: any = [];
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch(`/api/todosLancamentos`, {
         cache: "no-store",
       });
+      const response2 = await fetch(`/api/todasEntradasSaidas`, {
+        cache: "no-store",
+      });
+      const data2 = await response2.json();
       const data = await response.json();
       data.map((item: any) => {
+        var parcelasTT = 0;
+        var tAtraso = 0;
+        var tAtrasoVV = 0;
         totalInvest += parseFloat(item.totalEmprestimo);
+        totalAReceberV +=
+          parseFloat(item.totalEmprestimo) +
+          (parseFloat(item.jurosEmprestimo) / 100) *
+            parseFloat(item.totalEmprestimo);
+        totalProvJurosV +=
+          (parseFloat(item.jurosEmprestimo) / 100) *
+          parseFloat(item.totalEmprestimo);
+
+        data2.map((item2: any) => {
+          if (item.nomeCompleto === item2.nomeCompleto) {
+            if (item2.tipoLancamento === "Entrada") {
+              parcelasTT += parseInt(item2.totalParcelas);
+              if (item2.tempoPagamento === "Com Atraso") {
+                tAtrasoVV += 1;
+                tAtraso +=
+                  (parseFloat(item.multaDia) / 100) *
+                  parseFloat(item.totalEmprestimo);
+              }
+            }
+          }
+        });
+        if (listaVolatelNomes.includes(item.nomeCompleto)) {
+        } else {
+          listaVolatelNomes.push(item.nomeCompleto);
+          totalAtrasoV += tAtraso;
+          recPrincipalV +=
+            (parseFloat(item.totalEmprestimo) /
+              parseFloat(item.totalParcelas)) *
+            parcelasTT;
+          recPrincipalJurosV +=
+            (((parseFloat(item.jurosEmprestimo) / 100) *
+              parseFloat(item.totalEmprestimo)) /
+              parseFloat(item.totalParcelas)) *
+            parcelasTT;
+          listaVolatel.push({
+            nomeCompleto: item.nomeCompleto,
+            totalEmprestimo: item.totalEmprestimo,
+            jurosEmprestimo: item.jurosEmprestimo,
+            totalParcelas: item.totalParcelas,
+            totalParcelas2: parcelasTT,
+            atraso: tAtraso,
+            atrasoV: tAtrasoVV,
+            multaDia: item.multaDia,
+            createdAt: item.createdAt,
+          });
+        }
       });
-      setEmprestimoLista(data);
+      setTotalRecPrincipal(recPrincipalV);
+      setEmprestimoLista(listaVolatel);
+      setTotalAtraso(totalAtrasoV);
       setTotalInvestido(totalInvest);
+      setTotalAReceber(totalAReceberV);
+      setTotalProvJuros(totalProvJurosV);
+      setTotalRecJuros(recPrincipalJurosV);
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
@@ -77,7 +147,12 @@ const Lancamentos = () => {
                     <Text as="b">Rec. Principal:</Text>
                   </GridItem>
                   <GridItem w="100%" h="10">
-                    <Text as="b">0.00 Mt</Text>
+                    <Text as="b">
+                      {totalRecPrincipal.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      Mt{" "}
+                    </Text>
                   </GridItem>
                 </Grid>
               </Center>
@@ -89,7 +164,12 @@ const Lancamentos = () => {
                     <Text as="b">Rec. Juros:</Text>
                   </GridItem>
                   <GridItem w="100%" h="10">
-                    <Text as="b">0.00 Mt</Text>
+                    <Text as="b">
+                      {totalRecJuros.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      Mt{" "}
+                    </Text>
                   </GridItem>
                 </Grid>
               </Center>
@@ -101,7 +181,13 @@ const Lancamentos = () => {
                     <Text as="b">Prov. Juros:</Text>
                   </GridItem>
                   <GridItem w="100%" h="10">
-                    <Text as="b">0.00 Mt</Text>
+                    <Text as="b">
+                      {" "}
+                      {totalProvJuros.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      Mt
+                    </Text>
                   </GridItem>
                 </Grid>
               </Center>
@@ -113,7 +199,13 @@ const Lancamentos = () => {
                     <Text as="b">Atraso:</Text>
                   </GridItem>
                   <GridItem w="100%" h="10">
-                    <Text as="b">0.00 Mt</Text>
+                    <Text as="b">
+                      {" "}
+                      {totalAtraso.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      Mt{" "}
+                    </Text>
                   </GridItem>
                 </Grid>
               </Center>
@@ -125,7 +217,13 @@ const Lancamentos = () => {
                     <Text as="b">Total a Receber:</Text>
                   </GridItem>
                   <GridItem w="100%" h="10">
-                    <Text as="b">0.00 Mt</Text>
+                    <Text as="b">
+                      {" "}
+                      {totalAReceber.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      Mt
+                    </Text>
                   </GridItem>
                 </Grid>
               </Center>
@@ -231,13 +329,16 @@ const Lancamentos = () => {
                     <Box mx={4}>Multa % Dia</Box>
                   </th>
                   <th>
+                    <Box mx={4}>Multa (Mt) Dia</Box>
+                  </th>
+                  <th>
                     <Box mx={4}>Parcelas</Box>
                   </th>
                   <th>
                     <Box mx={4}>P. Quitadas</Box>
                   </th>
                   <th>
-                    <Box mx={4}>Parcela(Mt)</Box>
+                    <Box mx={4}>P. Quitadas(Mt)</Box>
                   </th>
                   <th>
                     <Box mx={4}>Rec. Amort</Box>
@@ -246,10 +347,10 @@ const Lancamentos = () => {
                     <Box mx={4}>Rec. Juros</Box>
                   </th>
                   <th>
-                    <Box mx={4}>T Atrasos</Box>
+                    <Box mx={4}>T. Atraso</Box>
                   </th>
                   <th>
-                    <Box mx={4}>Atrasado</Box>
+                    <Box mx={4}>T. Atraso(Mt)</Box>
                   </th>
                   <th>
                     <Box mx={4}>Dívida Actual</Box>
@@ -262,13 +363,21 @@ const Lancamentos = () => {
                     <>
                       <tr>
                         <td>
-                          <Box mx={4}>{ddf.createdAt}</Box>
+                          <Box mx={4}>{ddf.createdAt.substring(0, 10)}</Box>
                         </td>
                         <td>
                           <Box mx={4}>{ddf.nomeCompleto}</Box>
                         </td>
                         <td>
-                          <Box mx={4}>{ddf.totalEmprestimo}</Box>
+                          <Box mx={4}>
+                            {parseFloat(ddf.totalEmprestimo).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                              }
+                            )}{" "}
+                            Mt
+                          </Box>
                         </td>
                         <td>
                           <Box mx={4}>{ddf.jurosEmprestimo}%</Box>
@@ -286,10 +395,13 @@ const Lancamentos = () => {
                         </td>
                         <td>
                           <Box mx={4}>
-                            {parseFloat(ddf.totalEmprestimo).toLocaleString(
-                              "en-US",
-                              { minimumFractionDigits: 2 }
-                            )}{" "}
+                            {(
+                              parseFloat(ddf.totalEmprestimo) +
+                              (parseFloat(ddf.jurosEmprestimo) / 100) *
+                                parseFloat(ddf.totalEmprestimo)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
                             Mt
                           </Box>
                         </td>
@@ -297,32 +409,88 @@ const Lancamentos = () => {
                           <Box mx={4}>{ddf.multaDia}%</Box>
                         </td>
                         <td>
+                          <Box mx={4}>
+                            {(
+                              (parseFloat(ddf.multaDia) / 100) *
+                              parseFloat(ddf.totalEmprestimo)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
+                        </td>
+                        <td>
                           <Box mx={4}>{ddf.totalParcelas}</Box>
                         </td>
                         <td>
-                          <Box mx={4}>0</Box>
+                          <Box mx={4}>{ddf.totalParcelas2}</Box>
                         </td>
+
                         <td>
-                          <Box mx={4}></Box>
-                        </td>
-                        <td>
-                          <Box mx={4}></Box>
-                        </td>
-                        <td>
-                          <Box mx={4}></Box>
-                        </td>
-                        <td>
-                          <Box mx={4}></Box>
-                        </td>
-                        <td>
-                          <Box mx={4}></Box>
+                          <Box mx={4}>
+                            {(
+                              ((parseFloat(ddf.totalEmprestimo) +
+                                (parseFloat(ddf.jurosEmprestimo) / 100) *
+                                  parseFloat(ddf.totalEmprestimo)) /
+                                parseFloat(ddf.totalParcelas)) *
+                              parseFloat(ddf.totalParcelas2)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
                         </td>
                         <td>
                           <Box mx={4}>
-                            {parseFloat(ddf.totalEmprestimo).toLocaleString(
-                              "en-US",
-                              { minimumFractionDigits: 2 }
-                            )}{" "}
+                            {(
+                              (parseFloat(ddf.totalEmprestimo) /
+                                parseFloat(ddf.totalParcelas)) *
+                              parseFloat(ddf.totalParcelas2)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>
+                            {(
+                              (((parseFloat(ddf.jurosEmprestimo) / 100) *
+                                parseFloat(ddf.totalEmprestimo)) /
+                                parseFloat(ddf.totalParcelas)) *
+                              parseFloat(ddf.totalParcelas2)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>{ddf.atrasoV}</Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>
+                            {parseFloat(ddf.atraso).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>
+                            {(
+                              parseFloat(ddf.totalEmprestimo) +
+                              (parseFloat(ddf.jurosEmprestimo) / 100) *
+                                parseFloat(ddf.totalEmprestimo) -
+                              ((parseFloat(ddf.totalEmprestimo) +
+                                (parseFloat(ddf.jurosEmprestimo) / 100) *
+                                  parseFloat(ddf.totalEmprestimo)) /
+                                parseFloat(ddf.totalParcelas)) *
+                                parseFloat(ddf.totalParcelas2) +
+                              parseFloat(ddf.atraso)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
                             Mt
                           </Box>
                         </td>

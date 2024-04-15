@@ -21,10 +21,53 @@ import {
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 // kkkkkkkkk
 const EntradasSaidas = () => {
   const { colorMode } = useColorMode();
-
+  const { data: session } = useSession();
+  const [entradasSaidasLista, setEntradasSaidasLista] = useState<any[]>([]);
+  const [totalEmprestado, setTotalEmprestado] = useState(0);
+  const [totalRecebido, setTotalRecebido] = useState(0);
+  var totalInvest = 0;
+  var totalAReceberV = 0;
+  var totalProvJurosV = 0;
+  var listaVolatel: any = [];
+  var listaVolatelNomes: any = [];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await fetch(`/api/todosLancamentos`, {
+        cache: "no-store",
+      });
+      const response2 = await fetch(`/api/todasEntradasSaidas`, {
+        cache: "no-store",
+      });
+      const data2 = await response2.json();
+      const data = await response.json();
+      data.map((item: any) => {
+        data2.map((item2: any) => {
+          var parcelasTT = 0;
+          if (item.nomeCompleto === item2.nomeCompleto) {
+            parcelasTT += item2.totalParcelas;
+            listaVolatelNomes.push(item.nomeCompleto);
+            listaVolatel.push({
+              nomeCompleto: item2.nomeCompleto,
+              tipoLancamento: item2.tipoLancamento,
+              tempoPagamento: item2.tempoPagamento,
+              totalParcelas: item2.totalParcelas,
+              totalEmprestimo: item2.totalEmprestimo,
+              jurosEmprestimo: item.jurosEmprestimo,
+              totalParcelasBaseDados: item2.totalParcelasBaseDados,
+              createdAt: item2.createdAt,
+            });
+          }
+        });
+      });
+      setEntradasSaidasLista(listaVolatel);
+    };
+    if (session?.user) fetchPosts();
+  }, [session?.user]);
   return (
     <Box>
       <NavBar />
@@ -37,7 +80,12 @@ const EntradasSaidas = () => {
                   <Text as="b">Valor Emprestado:</Text>
                 </GridItem>
                 <GridItem w="100%" h="10">
-                  <Text as="b">0.00 Mt</Text>
+                  <Text as="b">
+                    {totalEmprestado.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    Mt
+                  </Text>
                 </GridItem>
               </Grid>
             </Center>
@@ -49,7 +97,12 @@ const EntradasSaidas = () => {
                   <Text as="b">Valor Recebido:</Text>
                 </GridItem>
                 <GridItem w="100%" h="10">
-                  <Text as="b">0.00 Mt</Text>
+                  <Text as="b">
+                    {totalRecebido.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    Mt
+                  </Text>
                 </GridItem>
               </Grid>
             </Center>
@@ -63,7 +116,7 @@ const EntradasSaidas = () => {
                 fontWeight={600}
                 color={"white"}
                 bg={"red.400"}
-                href={"#"}
+                href={"/novaEntradaSaida"}
                 _hover={{
                   bg: "red.500",
                 }}
@@ -144,12 +197,36 @@ const EntradasSaidas = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                <Tr>
-                  <Td></Td>
-                  <Td></Td>
-                  <Td></Td>
-                  <Td></Td>
-                </Tr>
+                {entradasSaidasLista.length > 0 &&
+                  entradasSaidasLista.map((ddf) => (
+                    <>
+                      <tr>
+                        <td>
+                          <Box mx={4}>{ddf.createdAt.substring(0, 10)}</Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>{ddf.nomeCompleto}</Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>{ddf.tipoLancamento}</Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>
+                            {(
+                              ((parseFloat(ddf.totalEmprestimo) +
+                                (parseFloat(ddf.jurosEmprestimo) / 100) *
+                                  parseFloat(ddf.totalEmprestimo)) /
+                                parseFloat(ddf.totalParcelasBaseDados)) *
+                              parseFloat(ddf.totalParcelas)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            Mt
+                          </Box>
+                        </td>
+                      </tr>
+                    </>
+                  ))}
               </Tbody>
             </Table>
           </TableContainer>
