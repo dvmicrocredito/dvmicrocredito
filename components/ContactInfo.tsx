@@ -28,7 +28,7 @@ const ContactInfo = () => {
         <Flex align="center">
           <Icon as={PhoneIcon} w={5} h={5} color="red.500" />
           <Text ml={2} color="red.500">
-            (+258) 84 298 0946 / (+258) 86 2682152
+            (+258) 84 298 0946 / 86 268 2152
           </Text>
         </Flex>
         <Flex align="center">
@@ -40,8 +40,8 @@ const ContactInfo = () => {
         <Flex align="center">
           <Icon as={AddIcon} w={5} h={5} color="red.500" />
           <Text ml={2} color="red.500">
-            Rua Enginheiro Carlos Morgado Nr 2500 R/C Rr 3, Bairro Aeroporto A,
-            Maputo - Moçambique
+            Rua Engenheiro Carlos Morgado Nr 2500 R/C Rr 3, Bairro Aeroporto A,
+            Maputo
           </Text>
         </Flex>
       </Stack>
