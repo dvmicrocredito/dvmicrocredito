@@ -15,8 +15,9 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { IoMdOptions } from "react-icons/io";
-
+import { useSession, signIn, signOut } from "next-auth/react";
 export default function Hero() {
+  const { data: session } = useSession();
   return (
     <Container maxW={"7xl"}>
       <Stack
@@ -48,7 +49,7 @@ export default function Hero() {
               DV Microcrédito
             </Text>
           </Heading>
-          <Heading
+          {/* <Heading
             lineHeight={0.1}
             fontWeight={400}
             fontSize={{ base: "3xl", sm: "4xl", lg: "3xl" }}
@@ -56,7 +57,7 @@ export default function Hero() {
             <Text as={"span"} color={"red.400"}>
               O Parceiro Ideal Para os Seus Investimentos.
             </Text>
-          </Heading>
+          </Heading> */}
 
           <Text color={"gray.500"} fontSize="lg">
             Você tem grandes planos para o futuro, mas às vezes o acesso ao
@@ -68,17 +69,36 @@ export default function Hero() {
             spacing={{ base: 4, sm: 6 }}
             direction={{ base: "column", sm: "row" }}
           >
-            <Button
-              rounded={"full"}
-              size={"lg"}
-              fontWeight={"normal"}
-              px={6}
-              colorScheme={"red"}
-              bg={"red.400"}
-              _hover={{ bg: "red.500" }}
-            >
-              <Link href="/solicitarEmprestimo">Solicitar Emprestimo</Link>
-            </Button>
+            {session?.user ? (
+              <>
+                <Button
+                  rounded={"full"}
+                  size={"lg"}
+                  fontWeight={"normal"}
+                  px={6}
+                  colorScheme={"red"}
+                  bg={"red.400"}
+                  _hover={{ bg: "red.500" }}
+                >
+                  <Link href="/solicitarEmprestimo">Solicitar Emprestimo</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  rounded={"full"}
+                  size={"lg"}
+                  fontWeight={"normal"}
+                  px={6}
+                  colorScheme={"blue"}
+                  bg={"blue.400"}
+                  onClick={() => signIn()}
+                  _hover={{ bg: "blue.500" }}
+                >
+                  <Link href="#">LogIn</Link>
+                </Button>
+              </>
+            )}
           </Stack>
         </Stack>
         <Flex
