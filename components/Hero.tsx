@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { IoMdOptions } from "react-icons/io";
 import { useSession, signIn, signOut } from "next-auth/react";
+// updates
 export default function Hero() {
   const { data: session } = useSession();
   return (
