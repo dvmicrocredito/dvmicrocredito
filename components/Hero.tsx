@@ -16,9 +16,34 @@ import {
 } from "@chakra-ui/react";
 import { IoMdOptions } from "react-icons/io";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
 // updates
 export default function Hero() {
   const { data: session } = useSession();
+  const [emailLista, setEmailLista] = useState<any[]>([]);
+  const [isEmail, setIsEmail] = useState(false);
+  var listaVolatel: any = [];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await fetch(`/api/todosLancamentos`, {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      data.map((item: any) => {
+        listaVolatel.push({ email: item.userId });
+      });
+      setEmailLista(listaVolatel);
+      console.log(listaVolatel);
+    };
+    emailLista.map((item: any) => {
+      if (item.email === session?.user?.email) {
+        console.log(item.email);
+        setIsEmail(true);
+      }
+    });
+
+    if (session?.user) fetchPosts();
+  }, [session?.user]);
   return (
     <Container maxW={"7xl"}>
       <Stack
@@ -72,17 +97,37 @@ export default function Hero() {
           >
             {session?.user ? (
               <>
-                <Button
-                  rounded={"full"}
-                  size={"lg"}
-                  fontWeight={"normal"}
-                  px={6}
-                  colorScheme={"red"}
-                  bg={"red.400"}
-                  _hover={{ bg: "red.500" }}
-                >
-                  <Link href="/solicitarEmprestimo">Solicitar Emprestimo</Link>
-                </Button>
+                {isEmail ? (
+                  <>
+                    <Button
+                      rounded={"full"}
+                      size={"lg"}
+                      fontWeight={"normal"}
+                      px={6}
+                      colorScheme={"red"}
+                      bg={"red.400"}
+                      _hover={{ bg: "red.500" }}
+                    >
+                      <Link href="/userStatus">Meus Emprestimos</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      rounded={"full"}
+                      size={"lg"}
+                      fontWeight={"normal"}
+                      px={6}
+                      colorScheme={"red"}
+                      bg={"red.400"}
+                      _hover={{ bg: "red.500" }}
+                    >
+                      <Link href="/solicitarEmprestimo">
+                        Solicitar Emprestimo
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </>
             ) : (
               <>
