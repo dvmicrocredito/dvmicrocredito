@@ -22,26 +22,23 @@ export default function Hero() {
   const { data: session } = useSession();
   const [emailLista, setEmailLista] = useState<any[]>([]);
   const [isEmail, setIsEmail] = useState(false);
+  const [isActive, setIsActive] = useState(false);
   var listaVolatel: any = [];
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`/api/todosLancamentos`, {
+      const response = await fetch(`/api/todosEmprestimos`, {
         cache: "no-store",
       });
       const data = await response.json();
       data.map((item: any) => {
-        listaVolatel.push({ email: item.userId });
+        if (item.userId === session?.user?.email) {
+          setIsEmail(true);
+          if (item.status) {
+            setIsActive(true);
+          }
+        }
       });
-      setEmailLista(listaVolatel);
-      console.log(listaVolatel);
     };
-    emailLista.map((item: any) => {
-      if (item.email === session?.user?.email) {
-        console.log(item.email);
-        setIsEmail(true);
-      }
-    });
-
     if (session?.user) fetchPosts();
   }, [session?.user]);
   return (
@@ -99,17 +96,27 @@ export default function Hero() {
               <>
                 {isEmail ? (
                   <>
-                    <Button
-                      rounded={"full"}
-                      size={"lg"}
-                      fontWeight={"normal"}
-                      px={6}
-                      colorScheme={"red"}
-                      bg={"red.400"}
-                      _hover={{ bg: "red.500" }}
-                    >
-                      <Link href="/userStatus">Meus Emprestimos</Link>
-                    </Button>
+                    {isActive ? (
+                      <>
+                        <Button
+                          rounded={"full"}
+                          size={"lg"}
+                          fontWeight={"normal"}
+                          px={6}
+                          colorScheme={"red"}
+                          bg={"red.400"}
+                          _hover={{ bg: "red.500" }}
+                        >
+                          <Link href="/userStatus">Histórico</Link>
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Text color={"gray.500"} fontSize="lg">
+                          O seu pedido de emprestimo ainda esta a ser avaliado!
+                        </Text>
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
