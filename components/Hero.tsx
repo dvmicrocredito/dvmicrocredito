@@ -113,7 +113,7 @@ export default function Hero() {
                     ) : (
                       <>
                         <Text color={"gray.500"} fontSize="lg">
-                          O seu pedido de emprestimo ainda esta a ser avaliado!
+                          O seu pedido de emprestimo está a ser avaliado!
                         </Text>
                       </>
                     )}
