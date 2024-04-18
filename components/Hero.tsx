@@ -112,9 +112,19 @@ export default function Hero() {
                       </>
                     ) : (
                       <>
-                        <Text color={"gray.500"} fontSize="lg">
-                          O seu pedido de emprestimo está a ser avaliado!
-                        </Text>
+                        <Button
+                          rounded={"full"}
+                          size={"lg"}
+                          fontWeight={"normal"}
+                          px={6}
+                          colorScheme={"blue"}
+                          bg={"blue.400"}
+                          _hover={{ bg: "blue.500" }}
+                        >
+                          <Link href="#">
+                            O seu pedido de emprestimo está a ser avaliado!
+                          </Link>
+                        </Button>
                       </>
                     )}
                   </>
