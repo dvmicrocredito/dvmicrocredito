@@ -248,6 +248,20 @@ const EmprestimosSolicitados = () => {
               fontWeight={600}
               color={"white"}
               bg={"red.400"}
+              href={"/solicitarEmprestimo"}
+              _hover={{
+                bg: "red.500",
+              }}
+            >
+              Novo Emprestimo
+            </Button>
+            <Button
+              as={"a"}
+              display={{ base: "none", md: "inline-flex" }}
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"red.400"}
               href={"/emprestimosSolicitados"}
               _hover={{
                 bg: "red.500",
