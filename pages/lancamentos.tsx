@@ -131,7 +131,7 @@ const Lancamentos = () => {
     });
     await axios({
       method: "post",
-      url: `https://desktop-api-4f850b3f9733.herokuapp.com/smsParaAtrasoSender/${phone}`,
+      url: `https://desktop-api-4f850b3f9733.herokuapp.com/smsAtrasoSender/${phone}`,
       data: { teste: "2" },
       headers: { "Content-Type": "multipart/form-data" },
     })
