@@ -26,7 +26,7 @@ import Footer from "../components/Footer";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
-
+import axios from "axios";
 const Lancamentos = () => {
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
@@ -117,6 +117,33 @@ const Lancamentos = () => {
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
+  async function smsAtrasoFuntion() {
+    const phone = "828033083";
+    toast("Enviano SMS para os clientes...", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    await axios({
+      method: "post",
+      url: `https://desktop-api-4f850b3f9733.herokuapp.com/smsParaAtrasoSender/${phone}`,
+      data: { teste: "2" },
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(function (response) {
+        //handle success
+        console.log(response);
+      })
+      .catch(function (response) {
+        //handle error
+        console.log(response);
+      });
+  }
   return (
     <Box>
       <NavBar />
@@ -280,6 +307,20 @@ const Lancamentos = () => {
               }}
             >
               Lançamentos
+            </Button>
+            <Button
+              as={"a"}
+              display={{ base: "none", md: "inline-flex" }}
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"red.400"}
+              onClick={() => smsAtrasoFuntion()}
+              _hover={{
+                bg: "red.500",
+              }}
+            >
+              Enviar SMS (Atraso de Pagamento)
             </Button>
             <Button
               as={"a"}

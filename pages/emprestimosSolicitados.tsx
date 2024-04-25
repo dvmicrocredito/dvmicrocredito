@@ -319,6 +319,7 @@ const EmprestimosSolicitados = () => {
                   <Th>Residência</Th>
                   <Th>Fonte de Rendimento</Th>
                   <Th>Emprestimo a Solicitado</Th>
+                  <Th>Anexos</Th>
                   <Th>Status</Th>
                 </Tr>
               </Thead>
@@ -360,6 +361,25 @@ const EmprestimosSolicitados = () => {
                               minimumFractionDigits: 2,
                             })}{" "}
                             Mt
+                          </Box>
+                        </td>
+                        <td>
+                          <Box mx={4}>
+                            {ddf.anexos.map((anexo: any) => (
+                              <>
+                                {" "}
+                                <Button
+                                  as={"a"}
+                                  fontSize={"sm"}
+                                  fontWeight={400}
+                                  variant={"link"}
+                                  href={anexo.link}
+                                >
+                                  Anexo
+                                </Button>{" "}
+                                |
+                              </>
+                            ))}
                           </Box>
                         </td>
                         {ddf.status ? (

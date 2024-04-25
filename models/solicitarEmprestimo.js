@@ -33,6 +33,11 @@ const EmprestimosSolicitadosSchema = new Schema(
     estadoCivil: { type: String, require: true },
     estadoCivilAvalista: { type: String, require: true },
     status: { type: Boolean, require: true },
+    anexos: [
+      {
+        link: { type: String },
+      },
+    ],
     userId: { type: String, require: true },
   },
   { timestamps: true }

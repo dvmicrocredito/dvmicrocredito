@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Flex,
@@ -9,7 +10,6 @@ import {
   Text,
   useColorMode,
   Button,
-  Link,
   Input,
   Container,
   NumberInput,
@@ -21,29 +21,25 @@ import {
   InputGroup,
   InputLeftAddon,
   Select,
-  CircularProgress,
-  CircularProgressLabel,
+  Image,
+  Center,
+  Square,
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-
+const anexosVolatel: any = [];
+const listLinks: any = [];
 const SolicitarEmprestimo = () => {
   const { colorMode } = useColorMode();
   const router = useRouter();
-  var volatelEmpr = [];
-  var incrMet = 0;
-  var investTotal = 0;
-  var jurosFuturo = 0;
-  var recPrincipalTotal = 0;
-  var recJurosTotal = 0;
-  var totalDivida = 0;
-  var totalDividaAtrasado = 0;
   const { data: session } = useSession();
   const [emprestimoLista, setEmprestimoLista] = useState([]);
+  const [anexosLista, setAnexosLista] = useState<any[]>([]);
   const [processando, setProcessando] = useState(false);
   const [formularioEnviado, setFormularioEnviado] = useState(false);
+  const [isAnexos, setIsAnexos] = useState(true);
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [nomeCompletoAvalista, setNomeCompletoAvalista] = useState("");
   const [bI, setBI] = useState("");
@@ -74,7 +70,8 @@ const SolicitarEmprestimo = () => {
   const [estadoCivil, setEstadoCivil] = useState("");
   const [estadoCivilAvalista, setEstadoCivilAvalista] = useState("");
   const [status, setStatus] = useState(false);
-
+  const [selectedImage, setSelectedImage] = React.useState();
+  const validFileTypes = ["image/png", "image/jpeg", "image/jpg"];
   function novoLancamento() {
     setProcessando(true);
     if (session?.user?.email) {
@@ -132,111 +129,129 @@ const SolicitarEmprestimo = () => {
         });
         setProcessando(false);
       } else {
-        toast("Enviando Solicitação de Emprestimo", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        try {
-          const response = fetch("/api/emprestimoSolicitado", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              nomeCompleto,
-              nomeCompletoAvalista,
-              bI,
-              bIAvalista,
-              contacto,
-              contactoAvalista,
-              saldo,
-              endereco,
-              enderecoAvalista,
-              numeroQuarteirao,
-              numeroQuarteiraoAvalista,
-              numeroCasa,
-              numeroCasaAvalista,
-              bairro,
-              bairroAvalista,
-              distrito,
-              distritoAvalista,
-              fonteRendimento,
-              garantias,
-              genero2,
-              genero2Avalista,
-              nUIT,
-              nUITAvalista,
-              dataNascimento,
-              dataNascimentoAvalista,
-              nacionalidade,
-              nacionalidadeAvalista,
-              estadoCivil,
-              estadoCivilAvalista,
-              status,
-              userId: session?.user?.email,
-            }),
+        if (listLinks.length === 0) {
+          setProcessando(false);
+          toast(
+            "Nenhum anexo carregado! Deve anexar o seus documentos ao formulario...",
+            {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            }
+          );
+        } else {
+          toast("Enviando Solicitação de Emprestimo", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
           });
+          try {
+            const response = fetch("/api/emprestimoSolicitado", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                nomeCompleto,
+                nomeCompletoAvalista,
+                bI,
+                bIAvalista,
+                contacto,
+                contactoAvalista,
+                saldo,
+                endereco,
+                enderecoAvalista,
+                numeroQuarteirao,
+                numeroQuarteiraoAvalista,
+                numeroCasa,
+                numeroCasaAvalista,
+                bairro,
+                bairroAvalista,
+                distrito,
+                distritoAvalista,
+                fonteRendimento,
+                garantias,
+                genero2,
+                genero2Avalista,
+                nUIT,
+                nUITAvalista,
+                dataNascimento,
+                dataNascimentoAvalista,
+                nacionalidade,
+                nacionalidadeAvalista,
+                estadoCivil,
+                estadoCivilAvalista,
+                status,
+                anexos: listLinks,
+                userId: session?.user?.email,
+              }),
+            });
 
-          setProcessando(false);
-          setFormularioEnviado(true);
-          toast("Solicitação Enviada", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setNomeCompleto("");
-          setNomeCompletoAvalista("");
-          setBI("");
-          setBIAvalista("");
-          setContacto("");
-          setContactoAvalista("");
-          setSaldo("");
-          setEndereco("");
-          setEnderecoAvalista("");
-          setNumeroQuarteirao("");
-          setNumeroQuarteiraoAvalista("");
-          setNumeroCasa("");
-          setNumeroCasaAvalista("");
-          setBairroAvalista("");
-          setBairro("");
-          setDistrito("");
-          setDistritoAvalista("");
-          setFonteRendimento("");
-          setGarantias("");
-          setGenero2("");
-          setGenero2Avalista("");
-          setNUIT("");
-          setNUITAvalista("");
-          setDataNascimento("");
-          setDataNascimentoAvalista("");
-          setNacionalidade("");
-          setNacionalidadeAvalista("");
-          setEstadoCivil("");
-          setEstadoCivilAvalista("");
-          router.push("/");
-        } catch (error) {
-          toast("Erro ao enviar pedido!", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setProcessando(false);
+            setProcessando(false);
+            setFormularioEnviado(true);
+            toast("Solicitação Enviada", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            setNomeCompleto("");
+            setNomeCompletoAvalista("");
+            setBI("");
+            setBIAvalista("");
+            setContacto("");
+            setContactoAvalista("");
+            setSaldo("");
+            setEndereco("");
+            setEnderecoAvalista("");
+            setNumeroQuarteirao("");
+            setNumeroQuarteiraoAvalista("");
+            setNumeroCasa("");
+            setNumeroCasaAvalista("");
+            setBairroAvalista("");
+            setBairro("");
+            setDistrito("");
+            setDistritoAvalista("");
+            setFonteRendimento("");
+            setGarantias("");
+            setGenero2("");
+            setGenero2Avalista("");
+            setNUIT("");
+            setNUITAvalista("");
+            setDataNascimento("");
+            setDataNascimentoAvalista("");
+            setNacionalidade("");
+            setNacionalidadeAvalista("");
+            setEstadoCivil("");
+            setEstadoCivilAvalista("");
+            router.push("/");
+          } catch (error) {
+            toast("Erro ao enviar pedido!", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            setProcessando(false);
+          }
         }
       }
     } else {
@@ -252,6 +267,33 @@ const SolicitarEmprestimo = () => {
       });
     }
   }
+  var bodyFormData = new FormData();
+
+  async function imageChange(e: any) {
+    if (e.target.files && e.target.files.length > 0) {
+      const fileSelected = e.target.files[0];
+      anexosVolatel.push(e.target.files[0]);
+      setSelectedImage(e.target.files[0]);
+      bodyFormData.append("file", fileSelected);
+      await axios({
+        method: "post",
+        url: "https://desktop-api-4f850b3f9733.herokuapp.com/docUpload",
+        data: bodyFormData,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then(function (response) {
+          //handle success
+          listLinks.push({ link: response.data });
+        })
+        .catch(function (response) {
+          //handle error
+          console.log(response);
+        });
+    }
+  }
+  useEffect(() => {
+    setAnexosLista(anexosVolatel);
+  }, [selectedImage]);
   return (
     <Box>
       <NavBar />
@@ -683,26 +725,45 @@ const SolicitarEmprestimo = () => {
               onChange={(e) => setNumeroCasaAvalista(e.target.value)}
             />
             <br />
+            <Text
+              mt={2}
+              color={colorMode === "light" ? "gray.600" : "gray.400"}
+            >
+              Anexos
+            </Text>
+            <div>
+              <input accept="image/*" type="file" onChange={imageChange} />
+              <Flex color="white">
+                <Center w="600px">
+                  {anexosLista.length > 0 &&
+                    anexosLista.map((anexo: any) => (
+                      <>
+                        <Image
+                          boxSize="100px"
+                          src={URL.createObjectURL(anexo)}
+                          alt={`${anexo.name}`}
+                          // width={100}
+                          // height={100}
+                        />
+                      </>
+                    ))}
+                </Center>
+              </Flex>
+            </div>
+            <br />
             <br />
             <small>
-              Nota: Os dados fornecidos serão usados para avaliar o seu pedido,
-              garanta que os mesmo estejam correctamente preenchidos...
+              Nota: Os dados e ficheiros fornecidos serão usados para avaliar o
+              seu pedido, garanta que os mesmo estejam correctamente
+              preenchidos...
             </small>
             <br />
             <br />
             <hr />
             <br />
-            {processando ? (
-              <>
-                <small>Enviando...</small>
-              </>
-            ) : (
-              <>
-                <Button colorScheme="blue" onClick={() => novoLancamento()}>
-                  Submeter Pedido
-                </Button>
-              </>
-            )}
+            <Button colorScheme="blue" onClick={() => novoLancamento()}>
+              Submeter Pedido
+            </Button>
           </Container>
         </Flex>
       </Box>
