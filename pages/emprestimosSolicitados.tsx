@@ -21,12 +21,13 @@ import {
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import PDFContrato from "../components/PDFContrato";
+import EditarEmprestimo from "./EditarEmprestimo";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 
-const EmprestimosSolicitados = () => {
+function EmprestimosSolicitados() {
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
   const router = useRouter();
@@ -235,6 +236,100 @@ const EmprestimosSolicitados = () => {
       estadoCivilAvalista: estadoCivilAvalista,
     });
   }
+  function EditarEmp(id: any) {
+    toast(`Processando...`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    emprestimoLista.map((emprestimo) => {
+      if (emprestimo._id === id) {
+        localStorage.setItem("id", id);
+        localStorage.setItem("nomeCompleto", `${emprestimo.nomeCompleto}`);
+        localStorage.setItem(
+          "nomeCompletoAvalista",
+          `${emprestimo.nomeCompletoAvalista}`
+        );
+        localStorage.setItem("bI", `${emprestimo.bI}`);
+        localStorage.setItem("bIAvalista", `${emprestimo.bIAvalista}`);
+        localStorage.setItem("contacto", `${emprestimo.contacto}`);
+        localStorage.setItem(
+          "contactoAvalista",
+          `${emprestimo.contactoAvalista}`
+        );
+        localStorage.setItem("saldo", `${emprestimo.saldo}`);
+        localStorage.setItem("endereco", `${emprestimo.endereco}`);
+        localStorage.setItem(
+          "enderecoAvalista",
+          `${emprestimo.enderecoAvalista}`
+        );
+        localStorage.setItem(
+          "numeroQuarteirao",
+          `${emprestimo.numeroQuarteirao}`
+        );
+        localStorage.setItem(
+          "numeroQuarteiraoAvalista",
+          `${emprestimo.numeroQuarteiraoAvalista}`
+        );
+        localStorage.setItem("numeroCasa", `${emprestimo.numeroCasa}`);
+        localStorage.setItem(
+          "numeroCasaAvalista",
+          `${emprestimo.numeroCasaAvalista}`
+        );
+        localStorage.setItem("bairroAvalista", `${emprestimo.bairroAvalista}`);
+        localStorage.setItem("bairro", `${emprestimo.bairro}`);
+        localStorage.setItem("distrito", `${emprestimo.distrito}`);
+        localStorage.setItem(
+          "distritoAvalista",
+          `${emprestimo.distritoAvalista}`
+        );
+        localStorage.setItem(
+          "fonteRendimento",
+          `${emprestimo.fonteRendimento}`
+        );
+        localStorage.setItem("garantias", `${emprestimo.garantias}`);
+        localStorage.setItem("genero2", `${emprestimo.genero2}`);
+        localStorage.setItem(
+          "genero2Avalista",
+          `${emprestimo.genero2Avalista}`
+        );
+        localStorage.setItem("nUIT", `${emprestimo.nUIT}`);
+        localStorage.setItem("nUITAvalista", `${emprestimo.nUITAvalista}`);
+        localStorage.setItem("dataNascimento", `${emprestimo.dataNascimento}`);
+        localStorage.setItem(
+          "dataNascimentoAvalista",
+          `${emprestimo.dataNascimentoAvalista}`
+        );
+        localStorage.setItem("nacionalidade", `${emprestimo.nacionalidade}`);
+        localStorage.setItem(
+          "nacionalidadeAvalista",
+          `${emprestimo.nacionalidadeAvalista}`
+        );
+        localStorage.setItem("estadoCivil", `${emprestimo.estadoCivil}`);
+        localStorage.setItem(
+          "estadoCivilAvalista",
+          `${emprestimo.estadoCivilAvalista}`
+        );
+        router.push("/EditarEmprestimo");
+      } else {
+        toast(`Erro ao carregar formulário!`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    });
+  }
   return (
     <Box>
       <NavBar />
@@ -432,6 +527,20 @@ const EmprestimosSolicitados = () => {
                               >
                                 Baixar Contacto
                               </Button>
+                              <Button
+                                as={"a"}
+                                display={{ base: "none", md: "inline-flex" }}
+                                fontSize={"sm"}
+                                fontWeight={600}
+                                color={"white"}
+                                bg={"blue.400"}
+                                onClick={() => EditarEmp(ddf._id)}
+                                _hover={{
+                                  bg: "blue.500",
+                                }}
+                              >
+                                Editar
+                              </Button>
                             </td>
                           </>
                         ) : (
@@ -498,6 +607,6 @@ const EmprestimosSolicitados = () => {
       <Footer />
     </Box>
   );
-};
+}
 
 export default EmprestimosSolicitados;

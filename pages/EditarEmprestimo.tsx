@@ -31,7 +31,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 const anexosVolatel: any = [];
 const listLinks: any = [];
-const SolicitarEmprestimo = () => {
+const EditarEmprestimo = () => {
   const { colorMode } = useColorMode();
   const router = useRouter();
   const { data: session } = useSession();
@@ -69,6 +69,7 @@ const SolicitarEmprestimo = () => {
   const [nacionalidadeAvalista, setNacionalidadeAvalista] = useState("");
   const [estadoCivil, setEstadoCivil] = useState("");
   const [estadoCivilAvalista, setEstadoCivilAvalista] = useState("");
+  const [id, setId] = useState("");
   const [status, setStatus] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState();
   const validFileTypes = ["image/png", "image/jpeg", "image/jpg"];
@@ -156,100 +157,61 @@ const SolicitarEmprestimo = () => {
             theme: "light",
           });
           try {
-            const response = fetch("/api/emprestimoSolicitado", {
-              method: "POST",
+            const response = fetch(`/api/${id}/updatepedido`, {
+              method: "PATCH",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                nomeCompleto,
-                nomeCompletoAvalista,
-                bI,
-                bIAvalista,
-                contacto,
-                contactoAvalista,
-                saldo,
-                endereco,
-                enderecoAvalista,
-                numeroQuarteirao,
-                numeroQuarteiraoAvalista,
-                numeroCasa,
-                numeroCasaAvalista,
-                bairro,
-                bairroAvalista,
-                distrito,
-                distritoAvalista,
-                fonteRendimento,
-                garantias,
-                genero2,
-                genero2Avalista,
-                nUIT,
-                nUITAvalista,
-                dataNascimento,
-                dataNascimentoAvalista,
-                nacionalidade,
-                nacionalidadeAvalista,
-                estadoCivil,
-                estadoCivilAvalista,
-                status,
-                anexos: listLinks,
+                idVerify: id,
+                nomeCompleto: nomeCompleto,
+                nomeCompletoAvalista: nomeCompletoAvalista,
+                bI: bI,
+                bIAvalista: bIAvalista,
+                contacto: contacto,
+                contactoAvalista: contactoAvalista,
+                saldo: saldo,
+                endereco: endereco,
+                enderecoAvalista: enderecoAvalista,
+                numeroQuarteirao: numeroQuarteirao,
+                numeroQuarteiraoAvalista: numeroQuarteiraoAvalista,
+                numeroCasa: numeroCasa,
+                numeroCasaAvalista: numeroCasaAvalista,
+                bairro: bairro,
+                bairroAvalista: bairroAvalista,
+                distrito: distrito,
+                distritoAvalista: distritoAvalista,
+                fonteRendimento: fonteRendimento,
+                garantias: garantias,
+                genero2: genero2,
+                genero2Avalista: genero2Avalista,
+                nUIT: nUIT,
+                nUITAvalista: nUITAvalista,
+                dataNascimento: dataNascimento,
+                dataNascimentoAvalista: dataNascimentoAvalista,
+                nacionalidade: nacionalidade,
+                nacionalidadeAvalista: nacionalidadeAvalista,
+                estadoCivil: estadoCivil,
+                estadoCivilAvalista: estadoCivilAvalista,
+                status: true,
                 userId: session?.user?.email,
               }),
             });
-
-            setProcessando(false);
-            setFormularioEnviado(true);
-            toast("Solicitação Enviada", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
-            setNomeCompleto("");
-            setNomeCompletoAvalista("");
-            setBI("");
-            setBIAvalista("");
-            setContacto("");
-            setContactoAvalista("");
-            setSaldo("");
-            setEndereco("");
-            setEnderecoAvalista("");
-            setNumeroQuarteirao("");
-            setNumeroQuarteiraoAvalista("");
-            setNumeroCasa("");
-            setNumeroCasaAvalista("");
-            setBairroAvalista("");
-            setBairro("");
-            setDistrito("");
-            setDistritoAvalista("");
-            setFonteRendimento("");
-            setGarantias("");
-            setGenero2("");
-            setGenero2Avalista("");
-            setNUIT("");
-            setNUITAvalista("");
-            setDataNascimento("");
-            setDataNascimentoAvalista("");
-            setNacionalidade("");
-            setNacionalidadeAvalista("");
-            setEstadoCivil("");
-            setEstadoCivilAvalista("");
-            router.push("/");
+            toast(
+              `O Emprestimo do(a) ${nomeCompleto} foi actualizado com sucesso!`,
+              {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+              }
+            );
+            router.reload();
           } catch (error) {
-            toast("Erro ao enviar pedido!", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
             setProcessando(false);
           }
         }
@@ -294,6 +256,51 @@ const SolicitarEmprestimo = () => {
   useEffect(() => {
     setAnexosLista(anexosVolatel);
   }, [selectedImage]);
+  useEffect(() => {
+    setAnexosLista(anexosVolatel);
+  }, [selectedImage]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setNomeCompleto(`${localStorage.getItem("nomeCompleto")}`);
+      setNomeCompletoAvalista(
+        `${localStorage.getItem("nomeCompletoAvalista")}`
+      );
+      setBI(`${localStorage.getItem("bI")}`);
+      setBIAvalista(`${localStorage.getItem("bIAvalista")}`);
+      setContacto(`${localStorage.getItem("contacto")}`);
+      setContactoAvalista(`${localStorage.getItem("contactoAvalista")}`);
+      setSaldo(`${localStorage.getItem("saldo")}`);
+      setEndereco(`${localStorage.getItem("endereco")}`);
+      setEnderecoAvalista(`${localStorage.getItem("enderecoAvalista")}`);
+      setNumeroQuarteirao(`${localStorage.getItem("numeroQuarteirao")}`);
+      setNumeroQuarteiraoAvalista(
+        `${localStorage.getItem("numeroQuarteiraoAvalista")}`
+      );
+      setNumeroCasa(`${localStorage.getItem("numeroCasa")}`);
+      setNumeroCasaAvalista(`${localStorage.getItem("numeroCasaAvalista")}`);
+      setBairroAvalista(`${localStorage.getItem("bairroAvalista")}`);
+      setBairro(`${localStorage.getItem("bairro")}`);
+      setDistrito(`${localStorage.getItem("distrito")}`);
+      setDistritoAvalista(`${localStorage.getItem("distritoAvalista")}`);
+      setFonteRendimento(`${localStorage.getItem("fonteRendimento")}`);
+      setGarantias(`${localStorage.getItem("garantias")}`);
+      setGenero2(`${localStorage.getItem("genero2")}`);
+      setGenero2Avalista(`${localStorage.getItem("genero2Avalista")}`);
+      setNUIT(`${localStorage.getItem("nUIT")}`);
+      setNUITAvalista(`${localStorage.getItem("nUITAvalista")}`);
+      setDataNascimento(`${localStorage.getItem("dataNascimento")}`);
+      setDataNascimentoAvalista(
+        `${localStorage.getItem("dataNascimentoAvalista")}`
+      );
+      setEstadoCivil(`${localStorage.getItem("estadoCivil")}`);
+      setEstadoCivilAvalista(`${localStorage.getItem("estadoCivilAvalista")}`);
+      setNacionalidade(`${localStorage.getItem("nacionalidade")}`);
+      setId(`${localStorage.getItem("id")}`);
+      setNacionalidadeAvalista(
+        `${localStorage.getItem("nacionalidadeAvalista")}`
+      );
+    }
+  }, []);
   return (
     <Box>
       <NavBar />
@@ -341,16 +348,12 @@ const SolicitarEmprestimo = () => {
             >
               NUIT
             </Text>
-            <NumberInput>
-              <NumberInputField
-                value={nUIT}
-                onChange={(e) => setNUIT(e.target.value)}
-              />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <Input
+              placeholder="NUIT"
+              type="text"
+              value={nUIT}
+              onChange={(e) => setNUIT(e.target.value)}
+            />
             <Text
               mt={2}
               color={colorMode === "light" ? "gray.600" : "gray.400"}
@@ -360,16 +363,12 @@ const SolicitarEmprestimo = () => {
             <Stack spacing={4}>
               <InputGroup>
                 <InputLeftAddon>+258</InputLeftAddon>
-                <NumberInput>
-                  <NumberInputField
-                    value={contacto}
-                    onChange={(e) => setContacto(e.target.value)}
-                  />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
+                <Input
+                  placeholder="Contacto"
+                  type="text"
+                  value={contacto}
+                  onChange={(e) => setContacto(e.target.value)}
+                />
               </InputGroup>
             </Stack>
             <Text
@@ -513,16 +512,13 @@ const SolicitarEmprestimo = () => {
             >
               Valor do Emprestimo a Solicitar
             </Text>
-            <NumberInput>
-              <NumberInputField
-                value={saldo}
-                onChange={(e) => setSaldo(e.target.value)}
-              />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <Input
+              placeholder="Valor do Emprestimo a Solicitar"
+              type="text"
+              value={saldo}
+              onChange={(e) => setSaldo(e.target.value)}
+            />
+
             <Text
               mt={2}
               color={colorMode === "light" ? "gray.600" : "gray.400"}
@@ -573,16 +569,11 @@ const SolicitarEmprestimo = () => {
             >
               NUIT
             </Text>
-            <NumberInput>
-              <NumberInputField
-                value={nUITAvalista}
-                onChange={(e) => setNUITAvalista(e.target.value)}
-              />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <Input
+              placeholder="NUIT"
+              value={nUITAvalista}
+              onChange={(e) => setNUITAvalista(e.target.value)}
+            />
             <Text
               mt={2}
               color={colorMode === "light" ? "gray.600" : "gray.400"}
@@ -592,16 +583,11 @@ const SolicitarEmprestimo = () => {
             <Stack spacing={4}>
               <InputGroup>
                 <InputLeftAddon>+258</InputLeftAddon>
-                <NumberInput>
-                  <NumberInputField
-                    value={contactoAvalista}
-                    onChange={(e) => setContactoAvalista(e.target.value)}
-                  />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
+                <Input
+                  placeholder="Contacto"
+                  value={contactoAvalista}
+                  onChange={(e) => setContactoAvalista(e.target.value)}
+                />
               </InputGroup>
             </Stack>
             <Text
@@ -772,4 +758,4 @@ const SolicitarEmprestimo = () => {
   );
 };
 
-export default SolicitarEmprestimo;
+export default EditarEmprestimo;

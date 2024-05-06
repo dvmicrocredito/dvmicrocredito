@@ -118,8 +118,7 @@ const Lancamentos = () => {
     if (session?.user) fetchPosts();
   }, [session?.user]);
   async function smsAtrasoFuntion() {
-    const phone = "828033083";
-    toast("Enviano SMS para os clientes...", {
+    toast(`O envio das sms's encontra-se temporariamente indisponível`, {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -129,20 +128,31 @@ const Lancamentos = () => {
       progress: undefined,
       theme: "light",
     });
-    await axios({
-      method: "post",
-      url: `https://desktop-api-4f850b3f9733.herokuapp.com/smsAtrasoSender/${phone}`,
-      data: { teste: "2" },
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then(function (response) {
-        //handle success
-        console.log(response);
-      })
-      .catch(function (response) {
-        //handle error
-        console.log(response);
-      });
+    // const phone = "828033083";
+    // toast("Enviano SMS para os clientes...", {
+    //   position: "top-right",
+    //   autoClose: 5000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    //   theme: "light",
+    // });
+    // await axios({
+    //   method: "post",
+    //   url: `https://desktop-api-4f850b3f9733.herokuapp.com/smsAtrasoSender/${phone}`,
+    //   data: { teste: "2" },
+    //   headers: { "Content-Type": "multipart/form-data" },
+    // })
+    //   .then(function (response) {
+    //     //handle success
+    //     console.log(response);
+    //   })
+    //   .catch(function (response) {
+    //     //handle error
+    //     console.log(response);
+    //   });
   }
   return (
     <Box>
@@ -320,7 +330,7 @@ const Lancamentos = () => {
                 bg: "red.500",
               }}
             >
-              Enviar SMS (Atraso de Pagamento)
+              Enviar SMS
             </Button>
             <Button
               as={"a"}

@@ -55,6 +55,9 @@ async function PDFContrato({
     " de " +
     currentdate.getFullYear();
   const imagemVarivel = await getBase64ImageFromURL("/assets/images/dv.png");
+  const imagemVarivel2 = await getBase64ImageFromURL(
+    "/assets/images/CarrimboeAssinatura.png"
+  );
   pdfMake.vfs = pdfFonts.pdfMake.vfs;
   pdfMake.fonts = {
     Roboto: {
@@ -769,16 +772,15 @@ async function PDFContrato({
       width: 5,
       text: "\n\n\n\n\n\n\n",
     },
+
     {
       alignment: "justify",
       columns: [
         {
-          width: "*",
+          image: imagemVarivel2,
+          width: 150,
+          height: 100,
           alignment: "center",
-          text: [
-            { text: "O MUTUANTE\n\n", fontSize: 12, bold: true },
-            { text: "______________________________" },
-          ],
         },
         {
           width: "*",
