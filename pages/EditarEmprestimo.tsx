@@ -131,10 +131,60 @@ const EditarEmprestimo = () => {
         });
         setProcessando(false);
       } else {
-        if (listLinks.length === 0) {
-          setProcessando(false);
+        toast("Enviando Solicitação de Emprestimo", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        try {
+          const response = fetch(`/api/${id}/updatepedido`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              idVerify: id,
+              nomeCompleto: nomeCompleto,
+              nomeCompletoAvalista: nomeCompletoAvalista,
+              bI: bI,
+              bIAvalista: bIAvalista,
+              contacto: contacto,
+              contactoAvalista: contactoAvalista,
+              saldo: saldo,
+              endereco: endereco,
+              enderecoAvalista: enderecoAvalista,
+              numeroQuarteirao: numeroQuarteirao,
+              numeroQuarteiraoAvalista: numeroQuarteiraoAvalista,
+              numeroCasa: numeroCasa,
+              numeroCasaAvalista: numeroCasaAvalista,
+              bairro: bairro,
+              bairroAvalista: bairroAvalista,
+              distrito: distrito,
+              distritoAvalista: distritoAvalista,
+              fonteRendimento: fonteRendimento,
+              garantias: garantias,
+              genero2: genero2,
+              genero2Avalista: genero2Avalista,
+              nUIT: nUIT,
+              nUITAvalista: nUITAvalista,
+              dataNascimento: dataNascimento,
+              dataNascimentoAvalista: dataNascimentoAvalista,
+              nacionalidade: nacionalidade,
+              nacionalidadeAvalista: nacionalidadeAvalista,
+              estadoCivil: estadoCivil,
+              estadoCivilAvalista: estadoCivilAvalista,
+              status: true,
+              juro,
+              userId: session?.user?.email,
+            }),
+          });
           toast(
-            "Deve anexar dois ou mais documentos ao formulario em formato de imagem...",
+            `O Emprestimo do(a) ${nomeCompleto} foi actualizado com sucesso!`,
             {
               position: "top-right",
               autoClose: 5000,
@@ -146,76 +196,9 @@ const EditarEmprestimo = () => {
               theme: "light",
             }
           );
-        } else {
-          toast("Enviando Solicitação de Emprestimo", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          try {
-            const response = fetch(`/api/${id}/updatepedido`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                idVerify: id,
-                nomeCompleto: nomeCompleto,
-                nomeCompletoAvalista: nomeCompletoAvalista,
-                bI: bI,
-                bIAvalista: bIAvalista,
-                contacto: contacto,
-                contactoAvalista: contactoAvalista,
-                saldo: saldo,
-                endereco: endereco,
-                enderecoAvalista: enderecoAvalista,
-                numeroQuarteirao: numeroQuarteirao,
-                numeroQuarteiraoAvalista: numeroQuarteiraoAvalista,
-                numeroCasa: numeroCasa,
-                numeroCasaAvalista: numeroCasaAvalista,
-                bairro: bairro,
-                bairroAvalista: bairroAvalista,
-                distrito: distrito,
-                distritoAvalista: distritoAvalista,
-                fonteRendimento: fonteRendimento,
-                garantias: garantias,
-                genero2: genero2,
-                genero2Avalista: genero2Avalista,
-                nUIT: nUIT,
-                nUITAvalista: nUITAvalista,
-                dataNascimento: dataNascimento,
-                dataNascimentoAvalista: dataNascimentoAvalista,
-                nacionalidade: nacionalidade,
-                nacionalidadeAvalista: nacionalidadeAvalista,
-                estadoCivil: estadoCivil,
-                estadoCivilAvalista: estadoCivilAvalista,
-                status: true,
-                juro,
-                userId: session?.user?.email,
-              }),
-            });
-            toast(
-              `O Emprestimo do(a) ${nomeCompleto} foi actualizado com sucesso!`,
-              {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-              }
-            );
-            router.reload();
-          } catch (error) {
-            setProcessando(false);
-          }
+          router.reload();
+        } catch (error) {
+          setProcessando(false);
         }
       }
     } else {
