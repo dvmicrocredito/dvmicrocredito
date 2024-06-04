@@ -37,6 +37,7 @@ function EmprestimosSolicitados() {
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [nomeCompletoAvalista, setNomeCompletoAvalista] = useState("");
   const [bI, setBI] = useState("");
+  const [juro, setJuro] = useState("0");
   const [bIAvalista, setBIAvalista] = useState("");
   const [contacto, setContacto] = useState("");
   const [contactoAvalista, setContactoAvalista] = useState("");
@@ -202,7 +203,8 @@ function EmprestimosSolicitados() {
     nacionalidade: any,
     nacionalidadeAvalista: any,
     estadoCivil: any,
-    estadoCivilAvalista: any
+    estadoCivilAvalista: any,
+    juro: any
   ) {
     PDFContrato({
       nomeCompleto: nomeCompleto,
@@ -234,6 +236,7 @@ function EmprestimosSolicitados() {
       nacionalidadeAvalista: nacionalidadeAvalista,
       estadoCivil: estadoCivil,
       estadoCivilAvalista: estadoCivilAvalista,
+      juro: juro,
     });
   }
   function EditarEmp(id: any) {
@@ -299,6 +302,7 @@ function EmprestimosSolicitados() {
           `${emprestimo.genero2Avalista}`
         );
         localStorage.setItem("nUIT", `${emprestimo.nUIT}`);
+        localStorage.setItem("juro", `${emprestimo.juro}`);
         localStorage.setItem("nUITAvalista", `${emprestimo.nUITAvalista}`);
         localStorage.setItem("dataNascimento", `${emprestimo.dataNascimento}`);
         localStorage.setItem(
@@ -518,7 +522,8 @@ function EmprestimosSolicitados() {
                                     ddf.nacionalidade,
                                     ddf.nacionalidadeAvalista,
                                     ddf.estadoCivil,
-                                    ddf.estadoCivilAvalista
+                                    ddf.estadoCivilAvalista,
+                                    ddf.juro
                                   )
                                 }
                                 _hover={{

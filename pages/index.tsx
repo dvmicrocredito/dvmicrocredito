@@ -25,7 +25,7 @@ const Home: NextPage = () => {
           <Stats />
           <AppointmentFeatures />
           <FAQ />
-          <Testimonials />
+          {/* <Testimonials /> */}
           {/* <MedicalCalculators /> */}
           {/* <HealthTips /> */}
           {/* <Quotes /> */}

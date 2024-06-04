@@ -32,6 +32,7 @@ async function PDFContrato({
   nacionalidadeAvalista,
   estadoCivil,
   estadoCivilAvalista,
+  juro,
 }) {
   const mesesList = [
     "Janeiro",
@@ -90,33 +91,31 @@ async function PDFContrato({
       width: 5,
       text: "\n",
     },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [
-        {
-          text: "MUTUANTE: DV Microcrédito",
-          fontSize: 12,
-          bold: true,
-        },
-        " neste acto representado polo Gestor Administrativo ",
-        { text: "Dércio Zefanias Valoi, ", fontSize: 12, bold: true },
-        "de nacionalidade moçambicana, solteiro, com o Bilhete de Identidade número 110100534002S, com o NUIT número 110870663, residente na Cidade de Maputo, distrito urbano de KaLhamanculo, Unidade - 7, Quarteirão número 16, Casa número 2039",
-      ],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: ["E"],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
+    // {
+    //   width: 5,
+    //   text: "\n",
+    // },
+    // {
+    //   text: [
+    //     {
+    //       text: "MUTUANTE: DV Microcrédito",
+    //       fontSize: 12,
+    //       bold: true,
+    //     },
+    //     ", com domícilio na rua Engenheiro Carlos Morgado, Nr. 2500 R/C, Bairro Aeroporto A",
+    //   ],
+    //   style: "bodyDoc",
+    //   alignment: "justify",
+    // },
+    // {
+    //   width: 5,
+    //   text: "\n",
+    // },
+    // {
+    //   text: ["E"],
+    //   style: "bodyDoc",
+    //   alignment: "justify",
+    // },
     {
       width: 5,
       text: "\n",
@@ -131,17 +130,17 @@ async function PDFContrato({
       style: "bodyDoc",
       alignment: "justify",
     },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [
-        "As partes acima identificadas têm, entre si, um contrato de mútuo financeiro individual, o qual é regulado pelas seguintes cláusulas:",
-      ],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
+    // {
+    //   width: 5,
+    //   text: "\n",
+    // },
+    // {
+    //   text: [
+    //     "As partes acima identificadas têm, entre si, um contrato de mútuo financeiro individual, o qual é regulado pelas seguintes cláusulas:",
+    //   ],
+    //   style: "bodyDoc",
+    //   alignment: "justify",
+    // },
     {
       width: 5,
       text: "\n\n",
@@ -228,7 +227,7 @@ async function PDFContrato({
           text: "O Avalista é responsável por dar credibilidade e segurança ao MUTUANTE, no presente contrato; este se torna, ",
         },
         {
-          text: "automaticamente devedor do empréstimo solicitado pelo MUTUÁRIO no caso de não pagamento deste.",
+          text: "automaticamente devedor do empréstimo solicitado pelo MUTUÁRIO no caso de não pagamento deste.__________________________________________(assinatura)",
         },
       ],
       style: "bodyDoc",
@@ -306,7 +305,7 @@ async function PDFContrato({
     },
     {
       text: [
-        { text: "1. O juro aplicado ao crédito é de 30% do valor cedido" },
+        { text: `1. O juro aplicado ao crédito é de ${juro}% do valor cedido` },
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -575,6 +574,27 @@ async function PDFContrato({
       text: "\n\n",
     },
     {
+      style: "tableExample",
+      table: {
+        widths: [100, "*", 200, "*"],
+        body: [
+          ["Bens", "Ano de Compra", "Descrição", "Avaliação"],
+          ["1.", { text: "" }, { text: "" }, { text: "" }],
+          ["2.", { text: "" }, { text: "" }, { text: "" }],
+          ["3.", { text: "" }, { text: "" }, { text: "" }],
+          ["4.", { text: "" }, { text: "" }, { text: "" }],
+          ["5.", { text: "" }, { text: "" }, { text: "" }],
+          ["6.", { text: "" }, { text: "" }, { text: "" }],
+          ["7.", { text: "" }, { text: "" }, { text: "" }],
+          ["8.", { text: "" }, { text: "" }, { text: "" }],
+        ],
+      },
+    },
+    {
+      width: 5,
+      text: "\n\n",
+    },
+    {
       text: [{ text: "(CLÁUSULA SÉTIMA)", fontSize: 12, bold: true }],
       style: "bodyDoc",
       alignment: "center",
@@ -599,73 +619,6 @@ async function PDFContrato({
         },
         { text: "MUTUÁRIO ", fontSize: 12, bold: true },
         { text: "para obter o valor do pagamento." },
-      ],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [
-        {
-          text: "2. Sempre que o Agente de Cobranças se deslocar para o endereço do",
-        },
-        { text: "MUTUÁRIO ", fontSize: 12, bold: true },
-        { text: "para efectuar a cobrança do valor de pagamento diário e o " },
-        { text: "MUTUÁRIO ", fontSize: 12, bold: true },
-        {
-          text: "não proceder com o pagamento por razões que não sejam de força maior tais como:",
-        },
-      ],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [{ text: "a) Falecimentos;" }],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [{ text: "b) Doenças;" }],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [
-        {
-          text: "fora as multas aplicáveis por incumprimento de pagamento dentro do prazo, o ",
-        },
-        { text: "MUTUÁRIO ", fontSize: 12, bold: true },
-        {
-          text: "deverá ressarcir imediatamente o valor de transporte, não superior a 100,00 Mt, gastos pelo Agente de Cobranças.",
-        },
-      ],
-      style: "bodyDoc",
-      alignment: "justify",
-    },
-    {
-      width: 5,
-      text: "\n",
-    },
-    {
-      text: [
-        {
-          text: "3. O valor referido no paragrafo 2, supra, desta Cláusula não amortiza o Crédito em divida.",
-        },
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -697,7 +650,11 @@ async function PDFContrato({
         {
           text: "1. O presente contrato passa a vigorar a partir da data da assinatura do mesmo e vigorará até a data da quitação da última parcela do empréstimo solicitado pelo ",
         },
-        { text: "MUTUÁRIO.", fontSize: 12, bold: true },
+        {
+          text: "MUTUÁRIO._____________________________________(assinatura)",
+          fontSize: 12,
+          bold: true,
+        },
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -733,7 +690,11 @@ async function PDFContrato({
         {
           text: "reserva-se o direito de resolução do conflito segundo as Normas de Resolução de Conflitos vigentes na ",
         },
-        { text: "DV Microcrédito", fontSize: 12, bold: true },
+        {
+          text: "DV Microcrédito._____________________________________(assinatura)",
+          fontSize: 12,
+          bold: true,
+        },
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -750,7 +711,9 @@ async function PDFContrato({
         { text: "MUTUANTE ", fontSize: 12, bold: true },
         { text: "pode de forma ponderada mover um processo crime contra o " },
         { text: "MUTUÁRIO ", fontSize: 12, bold: true },
-        { text: "no Tribunal Judicial do Distrito em causa." },
+        {
+          text: "no Tribunal Judicial do Distrito em causa._____________________________________(assinatura)",
+        },
       ],
       style: "bodyDoc",
       alignment: "justify",
@@ -844,6 +807,9 @@ async function PDFContrato({
       subheader: {
         fontSize: 12,
         bold: true,
+      },
+      tableExample: {
+        margin: [0, 5, 0, 15],
       },
       bodyDoc: {
         fontSize: 12,

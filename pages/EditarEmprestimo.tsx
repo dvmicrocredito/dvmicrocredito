@@ -43,6 +43,7 @@ const EditarEmprestimo = () => {
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [nomeCompletoAvalista, setNomeCompletoAvalista] = useState("");
   const [bI, setBI] = useState("");
+  const [juro, setJuro] = useState("0");
   const [bIAvalista, setBIAvalista] = useState("");
   const [contacto, setContacto] = useState("");
   const [contactoAvalista, setContactoAvalista] = useState("");
@@ -194,6 +195,7 @@ const EditarEmprestimo = () => {
                 estadoCivil: estadoCivil,
                 estadoCivilAvalista: estadoCivilAvalista,
                 status: true,
+                juro,
                 userId: session?.user?.email,
               }),
             });
@@ -318,6 +320,19 @@ const EditarEmprestimo = () => {
           <br />
           <br />
           <Container maxW="container.sm" color="red">
+            <Text
+              mt={2}
+              color={colorMode === "light" ? "gray.600" : "gray.400"}
+            >
+              Juros (%)
+            </Text>
+            <Input
+              placeholder="Juros (%)"
+              value={juro}
+              type="number"
+              onChange={(e) => setJuro(e.target.value)}
+            />
+            <br />
             <Text
               mt={2}
               color={colorMode === "light" ? "gray.600" : "gray.400"}

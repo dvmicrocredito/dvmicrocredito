@@ -42,6 +42,7 @@ const PATCH = async (req, res) => {
         existingPrompt.estadoCivilAvalista = req.body.estadoCivilAvalista;
         existingPrompt.userId = req.body.userId;
         existingPrompt.status = req.body.status;
+        existingPrompt.juro = req.body.juro;
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Cache-Control", "max-age=180000");

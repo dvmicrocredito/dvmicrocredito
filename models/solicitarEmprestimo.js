@@ -32,6 +32,7 @@ const EmprestimosSolicitadosSchema = new Schema(
     nacionalidadeAvalista: { type: String, require: true },
     estadoCivil: { type: String, require: true },
     estadoCivilAvalista: { type: String, require: true },
+    juro: { type: String },
     status: { type: Boolean, require: true },
     anexos: [
       {
