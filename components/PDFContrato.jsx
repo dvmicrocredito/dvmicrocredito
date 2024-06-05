@@ -785,11 +785,42 @@ async function PDFContrato({
       },
     ];
   }
+  function Rodape2() {
+    return [
+      {
+        style: "tableExample",
+        table: {
+          headerRows: 1,
+          widths: [90, 90, "*", 150, "*"],
+          body: [
+            [
+              { text: "Nome do Banco", style: "tableHeaderBancario" },
+              { text: "Número da Conta", style: "tableHeaderBancario" },
+              { text: "NIB da Conta", style: "tableHeaderBancario" },
+              { text: "IBAN", style: "tableHeaderBancario" },
+              { text: "SWIFT", style: "tableHeaderBancario" },
+            ],
+            [
+              { text: "Moza Banco", style: "tableHeaderBancario" },
+              { text: "3787497010001", style: "tableHeaderBancario" },
+              { text: "003400003787497010180", style: "tableHeaderBancario" },
+              {
+                text: "MZ59003400003787497010180",
+                style: "tableHeaderBancario",
+              },
+              { text: "MOZAMZMA", style: "tableHeaderBancario" },
+            ],
+          ],
+        },
+        layout: "noBorders",
+      },
+    ];
+  }
 
   const docDefinitions = {
     pageSize: "A4",
     pageMargins: [25, 50, 20, 40],
-    header: [reportTitle],
+    header: Rodape,
     content: [details],
     background: [
       {
@@ -798,7 +829,7 @@ async function PDFContrato({
         opacity: 0.1,
       },
     ],
-    footer: Rodape,
+    footer: Rodape2,
     styles: {
       header: {
         fontSize: 15,
@@ -810,14 +841,22 @@ async function PDFContrato({
       },
       tableExample: {
         margin: [0, 5, 0, 15],
+        alignment: "center",
       },
       bodyDoc: {
         fontSize: 12,
       },
+      tableHeaderBancario: {
+        bold: true,
+        fontSize: 7,
+        color: "black",
+      },
     },
   };
 
-  pdfMake.createPdf(docDefinitions).download();
+  pdfMake
+    .createPdf(docDefinitions)
+    .download(`Contracto de Solicitação de Emprestimo (${nomeCompleto}).pdf`);
 }
 
 export default PDFContrato;

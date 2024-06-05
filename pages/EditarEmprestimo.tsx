@@ -281,6 +281,7 @@ const EditarEmprestimo = () => {
       setEstadoCivilAvalista(`${localStorage.getItem("estadoCivilAvalista")}`);
       setNacionalidade(`${localStorage.getItem("nacionalidade")}`);
       setId(`${localStorage.getItem("id")}`);
+      setJuro(`${localStorage.getItem("juro")}`);
       setNacionalidadeAvalista(
         `${localStorage.getItem("nacionalidadeAvalista")}`
       );

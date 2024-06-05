@@ -302,7 +302,12 @@ function EmprestimosSolicitados() {
           `${emprestimo.genero2Avalista}`
         );
         localStorage.setItem("nUIT", `${emprestimo.nUIT}`);
-        localStorage.setItem("juro", `${emprestimo.juro}`);
+        if (emprestimo.juro) {
+          localStorage.setItem("juro", `${emprestimo.juro}`);
+        } else {
+          localStorage.setItem("juro", "0");
+        }
+
         localStorage.setItem("nUITAvalista", `${emprestimo.nUITAvalista}`);
         localStorage.setItem("dataNascimento", `${emprestimo.dataNascimento}`);
         localStorage.setItem(
@@ -321,16 +326,16 @@ function EmprestimosSolicitados() {
         );
         router.push("/EditarEmprestimo");
       } else {
-        toast(`Erro ao carregar formulário!`, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        // toast(`Erro ao carregar formulário!`, {
+        //   position: "top-right",
+        //   autoClose: 5000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        //   theme: "light",
+        // });
       }
     });
   }
