@@ -27,6 +27,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import ExtractoPDF from "../components/ExtractoPDF";
 const Lancamentos = () => {
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
@@ -55,16 +56,17 @@ const Lancamentos = () => {
       });
       const data2 = await response2.json();
       const data = await response.json();
+      totalAReceberV = 0;
       data.map((item: any) => {
         var parcelasTT = 0;
         var tAtraso = 0;
         var tAtrasoVV = 0;
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         totalInvest += parseFloat(item.totalEmprestimo);
-        totalAReceberV +=
-          parseFloat(item.totalEmprestimo) +
-          (parseFloat(item.jurosEmprestimo) / 100) *
-            parseFloat(item.totalEmprestimo);
+
         totalProvJurosV +=
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           (parseFloat(item.jurosEmprestimo) / 100) *
           parseFloat(item.totalEmprestimo);
 
@@ -84,16 +86,39 @@ const Lancamentos = () => {
         if (listaVolatelNomes.includes(item.nomeCompleto)) {
         } else {
           listaVolatelNomes.push(item.nomeCompleto);
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           totalAtrasoV += tAtraso;
           recPrincipalV +=
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             (parseFloat(item.totalEmprestimo) /
               parseFloat(item.totalParcelas)) *
             parcelasTT;
           recPrincipalJurosV +=
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             (((parseFloat(item.jurosEmprestimo) / 100) *
               parseFloat(item.totalEmprestimo)) /
               parseFloat(item.totalParcelas)) *
             parcelasTT;
+
+          if (
+            parseFloat(item.totalParcelas) === parseFloat(parcelasTT.toString())
+          ) {
+          } else {
+            var divida =
+              parseFloat(item.totalEmprestimo || "0") +
+              (parseFloat(item.jurosEmprestimo || "0") / 100) *
+                parseFloat(item.totalEmprestimo || "0");
+
+            var pQitada =
+              ((parseFloat(item.totalEmprestimo || "0") +
+                (parseFloat(item.jurosEmprestimo || "0") / 100) *
+                  parseFloat(item.totalEmprestimo || "0")) /
+                parseFloat(item.totalParcelas || "0")) *
+              parseFloat(item.totalParcelas2 || "0");
+            totalAReceberV += divida - pQitada;
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+          }
+
           listaVolatel.push({
             nomeCompleto: item.nomeCompleto,
             totalEmprestimo: item.totalEmprestimo,
@@ -107,6 +132,7 @@ const Lancamentos = () => {
           });
         }
       });
+      console.log(listaVolatel);
       setTotalRecPrincipal(recPrincipalV);
       setEmprestimoLista(listaVolatel);
       setTotalAtraso(totalAtrasoV);
@@ -153,6 +179,17 @@ const Lancamentos = () => {
     //     //handle error
     //     console.log(response);
     //   });
+  }
+  async function gerarExtractoPDF() {
+    ExtractoPDF({
+      emprestimoLista,
+      totalInvestido,
+      totalRecPrincipal,
+      totalRecJuros,
+      totalProvJuros,
+      totalAtraso,
+      totalAReceber,
+    });
   }
   return (
     <Box>
@@ -345,6 +382,21 @@ const Lancamentos = () => {
               }}
             >
               Entradas/Saídas
+            </Button>
+            <Button
+              as={"a"}
+              display={{ base: "none", md: "inline-flex" }}
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"red.400"}
+              href={"#"}
+              onClick={() => gerarExtractoPDF()}
+              _hover={{
+                bg: "red.500",
+              }}
+            >
+              Extrato
             </Button>
           </Stack>
           <Heading
