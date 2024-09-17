@@ -44,6 +44,7 @@ const SolicitarEmprestimo = () => {
   const { data: session } = useSession();
   const [emprestimoLista, setEmprestimoLista] = useState([]);
   const [clientesLista, setClientesLista] = useState([]);
+  const [cNomesLista, setCNomesLista] = useState([]);
   const [processando, setProcessando] = useState(false);
   const [formularioEnviado, setFormularioEnviado] = useState(false);
   const [nomeCompleto, setNomeCompleto] = useState("");
@@ -51,19 +52,34 @@ const SolicitarEmprestimo = () => {
   const [totalEmprestimo, setTotalEmprestimo] = useState("");
   const [totalParcelas, setTotalParcelas] = useState("");
   const [multaDia, setMultaDia] = useState("");
+  const [isNomeIncluded, setIsNomeIncluded] = useState(false);
+  const [isLancar, setIsLancar] = useState(false);
   var funcionariosVolatel: any = [];
+  var listaVolatelNomes: any = [];
   useEffect(() => {
     funcionariosVolatel = [];
+    listaVolatelNomes = [];
     const fetchPosts = async () => {
       const response = await fetch(`/api/todosEmprestimos`, {
         cache: "no-store",
       });
+      const response2 = await fetch(`/api/todosLancamentos`, {
+        cache: "no-store",
+      });
       const data = await response.json();
+      const data2 = await response2.json();
       data.map((funcionario: any) => {
         funcionariosVolatel.push(funcionario.nomeCompleto);
       });
+      data2.map((item: any) => {
+        if (listaVolatelNomes.includes(item.nomeCompleto)) {
+        } else {
+          listaVolatelNomes.push(item.nomeCompleto);
+        }
+      });
       setEmprestimoLista(data);
       setClientesLista(funcionariosVolatel);
+      setCNomesLista(listaVolatelNomes);
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
@@ -88,9 +104,15 @@ const SolicitarEmprestimo = () => {
     });
   }, [nomeCompleto]);
   function novoLancamento() {
-    setProcessando(true);
-    if (session?.user?.email) {
-      toast("Processando", {
+    var listaVolatelNomesVolatel: any = [];
+    cNomesLista.map((item) => {
+      if (listaVolatelNomesVolatel.includes(item)) {
+      } else {
+        listaVolatelNomesVolatel.push(item);
+      }
+    });
+    if (listaVolatelNomesVolatel.includes(nomeCompleto)) {
+      toast(`Já existe um lançamento com o nome ${nomeCompleto}`, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -100,54 +122,99 @@ const SolicitarEmprestimo = () => {
         progress: undefined,
         theme: "light",
       });
-      if (
-        nomeCompleto === "" ||
-        jurosEmprestimo === "" ||
-        totalEmprestimo === "" ||
-        multaDia === "" ||
-        totalParcelas === ""
-      ) {
-        toast("Todos os campos devem ser preenchidos", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setProcessando(false);
-      } else {
-        toast("Enviando Solicitação de Emprestimo", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        try {
-          const response = fetch("/api/novoLancamento", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              nomeCompleto,
-              totalEmprestimo,
-              jurosEmprestimo,
-              totalParcelas,
-              multaDia,
-              userId: session?.user?.email,
-            }),
+    } else {
+      if (true) {
+        setProcessando(true);
+        if (session?.user?.email) {
+          toast("Processando", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
           });
+          if (
+            nomeCompleto === "" ||
+            jurosEmprestimo === "" ||
+            totalEmprestimo === "" ||
+            multaDia === "" ||
+            totalParcelas === ""
+          ) {
+            toast("Todos os campos devem ser preenchidos", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            setProcessando(false);
+          } else {
+            toast("Enviando Solicitação de Emprestimo", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            try {
+              const response = fetch("/api/novoLancamento", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  nomeCompleto,
+                  totalEmprestimo,
+                  jurosEmprestimo,
+                  totalParcelas,
+                  multaDia,
+                  userId: session?.user?.email,
+                }),
+              });
 
-          setProcessando(false);
-          setFormularioEnviado(true);
-          toast("Solicitação Enviada", {
+              setProcessando(false);
+              setFormularioEnviado(true);
+              toast("Solicitação Enviada", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+              });
+              setNomeCompleto("");
+              setJurosEmprestimo("");
+              setTotalEmprestimo("");
+              setTotalParcelas("");
+              setMultaDia("");
+              router.push("/lancamentos");
+            } catch (error) {
+              toast("Erro ao enviar pedido!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+              });
+              setProcessando(false);
+            }
+          }
+        } else {
+          toast("Faça LogIn Para Poder Submeter o Pedido!", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -157,37 +224,8 @@ const SolicitarEmprestimo = () => {
             progress: undefined,
             theme: "light",
           });
-          setNomeCompleto("");
-          setJurosEmprestimo("");
-          setTotalEmprestimo("");
-          setTotalParcelas("");
-          setMultaDia("");
-          router.push("/lancamentos");
-        } catch (error) {
-          toast("Erro ao enviar pedido!", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setProcessando(false);
         }
       }
-    } else {
-      toast("Faça LogIn Para Poder Submeter o Pedido!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
     }
   }
   return (
