@@ -5,37 +5,68 @@ import {
   Heading,
   Text,
   useColorMode,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Td,
-  TableCaption,
-  TableContainer,
   Stack,
   Button,
   Grid,
   GridItem,
   Center,
-  Input,
+  Select,
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { createColumnHelper } from "@tanstack/react-table";
+import { DataTable } from "../components/TDataTableEntradaSaida/DataTable";
+type TodoItem = {
+  id: number;
+  createdAt: string;
+  nomeCompleto: string;
+  tipoLancamento: string;
+  value: string;
+};
+const columnHelper = createColumnHelper<TodoItem>();
+
 // kkkkkkkkk
 const EntradasSaidas = () => {
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
-  const [entradasSaidasLista, setEntradasSaidasLista] = useState<any[]>([]);
+  const [entradasSaidasLista, setEntradasSaidasLista] = useState([]);
+  const [clientesLista, setClientesLista] = useState([]);
+  const [clientesListaTable, setClientesListaTable] = useState([]);
   const [totalEmprestado, setTotalEmprestado] = useState(0);
   const [totalRecebido, setTotalRecebido] = useState(0);
+  const [clienteClicked, setClienteClicked] = useState("");
+
   var totalInvest = 0;
   var totalAReceberV = 0;
   var totalProvJurosV = 0;
   var listaVolatel: any = [];
   var listaVolatelNomes: any = [];
+  var listaClientesVolatel: any = [];
+  const columns = [
+    columnHelper.accessor("createdAt", {
+      cell: (info) => info.getValue(),
+      header: "Data",
+    }),
+    columnHelper.accessor("nomeCompleto", {
+      cell: (info) => info.getValue(),
+      header: "Nome Cliente",
+    }),
+    columnHelper.accessor("tipoLancamento", {
+      cell: (info) => info.getValue(),
+      header: "Operação",
+    }),
+    columnHelper.accessor("value", {
+      cell: (info) => info.getValue(),
+      header: "Saldo",
+    }),
+  ];
   useEffect(() => {
+    setEntradasSaidasLista([]);
+    setTotalEmprestado(0);
+    setTotalRecebido(0);
+    listaVolatel = [];
     const fetchPosts = async () => {
       const response = await fetch(`/api/todosLancamentos`, {
         cache: "no-store",
@@ -50,19 +81,29 @@ const EntradasSaidas = () => {
           var parcelasTT = 0;
           if (item.nomeCompleto === item2.nomeCompleto) {
             parcelasTT += item2.totalParcelas;
+            if (listaClientesVolatel.includes(item.nomeCompleto)) {
+            } else {
+              listaClientesVolatel.push(item.nomeCompleto);
+            }
             listaVolatelNomes.push(item.nomeCompleto);
             listaVolatel.push({
               nomeCompleto: item2.nomeCompleto,
               tipoLancamento: item2.tipoLancamento,
+              value: `${(
+                ((parseFloat(item2.totalEmprestimo) +
+                  (parseFloat(item.jurosEmprestimo) / 100) *
+                    parseFloat(item2.totalEmprestimo)) /
+                  parseFloat(item2.totalParcelasBaseDados)) *
+                parseFloat(item2.totalParcelas)
+              ).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })} Mt`,
               tempoPagamento: item2.tempoPagamento,
-              totalParcelas: item2.totalParcelas,
-              totalEmprestimo: item2.totalEmprestimo,
-              jurosEmprestimo: item.jurosEmprestimo,
-              totalParcelasBaseDados: item2.totalParcelasBaseDados,
-              createdAt: item2.createdAt,
+              createdAt: item2.createdAt.substring(0, 10),
             });
             if (item2.tipoLancamento === "Saída") {
               totalInvest +=
+                // eslint-disable-next-line react-hooks/exhaustive-deps
                 ((parseFloat(item2.totalEmprestimo) +
                   (parseFloat(item.jurosEmprestimo) / 100) *
                     parseFloat(item2.totalEmprestimo)) /
@@ -70,6 +111,7 @@ const EntradasSaidas = () => {
                 parseFloat(item2.totalParcelas);
             } else {
               totalAReceberV +=
+                // eslint-disable-next-line react-hooks/exhaustive-deps
                 ((parseFloat(item2.totalEmprestimo) +
                   (parseFloat(item.jurosEmprestimo) / 100) *
                     parseFloat(item2.totalEmprestimo)) /
@@ -82,9 +124,126 @@ const EntradasSaidas = () => {
       setEntradasSaidasLista(listaVolatel);
       setTotalEmprestado(totalInvest);
       setTotalRecebido(totalAReceberV);
+      setClientesLista(listaClientesVolatel);
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
+  useEffect(() => {
+    setEntradasSaidasLista([]);
+    setTotalEmprestado(0);
+    setTotalRecebido(0);
+    listaVolatel = [];
+    const fetchPosts = async () => {
+      const response = await fetch(`/api/todosLancamentos`, {
+        cache: "no-store",
+      });
+      const response2 = await fetch(`/api/todasEntradasSaidas`, {
+        cache: "no-store",
+      });
+      const data2 = await response2.json();
+      const data = await response.json();
+      if (clienteClicked === "Clientes") {
+        data.map((item: any) => {
+          data2.map((item2: any) => {
+            var parcelasTT = 0;
+            if (item.nomeCompleto === item2.nomeCompleto) {
+              parcelasTT += item2.totalParcelas;
+              if (listaClientesVolatel.includes(item.nomeCompleto)) {
+              } else {
+                listaClientesVolatel.push(item.nomeCompleto);
+              }
+              listaVolatelNomes.push(item.nomeCompleto);
+              listaVolatel.push({
+                nomeCompleto: item2.nomeCompleto,
+                tipoLancamento: item2.tipoLancamento,
+                value: `${(
+                  ((parseFloat(item2.totalEmprestimo) +
+                    (parseFloat(item.jurosEmprestimo) / 100) *
+                      parseFloat(item2.totalEmprestimo)) /
+                    parseFloat(item2.totalParcelasBaseDados)) *
+                  parseFloat(item2.totalParcelas)
+                ).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })} Mt`,
+                tempoPagamento: item2.tempoPagamento,
+                createdAt: item2.createdAt.substring(0, 10),
+              });
+              if (item2.tipoLancamento === "Saída") {
+                totalInvest +=
+                  // eslint-disable-next-line react-hooks/exhaustive-deps
+                  ((parseFloat(item2.totalEmprestimo) +
+                    (parseFloat(item.jurosEmprestimo) / 100) *
+                      parseFloat(item2.totalEmprestimo)) /
+                    parseFloat(item2.totalParcelasBaseDados)) *
+                  parseFloat(item2.totalParcelas);
+              } else {
+                totalAReceberV +=
+                  // eslint-disable-next-line react-hooks/exhaustive-deps
+                  ((parseFloat(item2.totalEmprestimo) +
+                    (parseFloat(item.jurosEmprestimo) / 100) *
+                      parseFloat(item2.totalEmprestimo)) /
+                    parseFloat(item2.totalParcelasBaseDados)) *
+                  parseFloat(item2.totalParcelas);
+              }
+            }
+          });
+        });
+      } else {
+        data.map((item: any) => {
+          data2.map((item2: any) => {
+            var parcelasTT = 0;
+            if (item.nomeCompleto === item2.nomeCompleto) {
+              if (clienteClicked === item2.nomeCompleto) {
+                parcelasTT += item2.totalParcelas;
+                if (listaClientesVolatel.includes(item.nomeCompleto)) {
+                } else {
+                  listaClientesVolatel.push(item.nomeCompleto);
+                }
+                listaVolatelNomes.push(item.nomeCompleto);
+                listaVolatel.push({
+                  nomeCompleto: item2.nomeCompleto,
+                  tipoLancamento: item2.tipoLancamento,
+                  value: `${(
+                    ((parseFloat(item2.totalEmprestimo) +
+                      (parseFloat(item.jurosEmprestimo) / 100) *
+                        parseFloat(item2.totalEmprestimo)) /
+                      parseFloat(item2.totalParcelasBaseDados)) *
+                    parseFloat(item2.totalParcelas)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })} Mt`,
+                  tempoPagamento: item2.tempoPagamento,
+                  createdAt: item2.createdAt.substring(0, 10),
+                });
+                if (item2.tipoLancamento === "Saída") {
+                  totalInvest +=
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                    ((parseFloat(item2.totalEmprestimo) +
+                      (parseFloat(item.jurosEmprestimo) / 100) *
+                        parseFloat(item2.totalEmprestimo)) /
+                      parseFloat(item2.totalParcelasBaseDados)) *
+                    parseFloat(item2.totalParcelas);
+                } else {
+                  totalAReceberV +=
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                    ((parseFloat(item2.totalEmprestimo) +
+                      (parseFloat(item.jurosEmprestimo) / 100) *
+                        parseFloat(item2.totalEmprestimo)) /
+                      parseFloat(item2.totalParcelasBaseDados)) *
+                    parseFloat(item2.totalParcelas);
+                }
+              }
+            }
+          });
+        });
+      }
+
+      setEntradasSaidasLista(listaVolatel);
+      setTotalEmprestado(totalInvest);
+      setTotalRecebido(totalAReceberV);
+    };
+    if (session?.user) fetchPosts();
+  }, [clienteClicked]);
   return (
     <Box>
       <NavBar />
@@ -143,7 +302,18 @@ const EntradasSaidas = () => {
             </Center>
           </GridItem>
           <GridItem w="100%" h="10">
-            <Input placeholder="Filtrar Pelo Nome do Cliente" />
+            <Select onChange={(e) => setClienteClicked(e.target.value)}>
+              <option value={"Clientes"} key={"Clientes"}>
+                {"Clientes"}
+              </option>
+              {clientesLista.map((item) => (
+                <>
+                  <option value={item} key={item}>
+                    {item}
+                  </option>
+                </>
+              ))}
+            </Select>
           </GridItem>
         </Grid>
         <br />
@@ -201,57 +371,15 @@ const EntradasSaidas = () => {
           >
             Entradas e Saídas
           </Heading>
-
-          <TableContainer>
-            <Table variant="striped" colorScheme="teal">
-              <TableCaption>DV Microcrédito</TableCaption>
-              <Thead>
-                <Tr>
-                  <th>Data</th>
-                  <th>Nome Cliente</th>
-                  <th>Operação</th>
-                  <th>Saldo</th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {entradasSaidasLista.length > 0 &&
-                  entradasSaidasLista.map((ddf) => (
-                    <>
-                      <tr>
-                        <td>
-                          <Box mx={4}>{ddf.createdAt.substring(0, 10)}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.nomeCompleto}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.tipoLancamento}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              ((parseFloat(ddf.totalEmprestimo) +
-                                (parseFloat(ddf.jurosEmprestimo) / 100) *
-                                  parseFloat(ddf.totalEmprestimo)) /
-                                parseFloat(ddf.totalParcelasBaseDados)) *
-                              parseFloat(ddf.totalParcelas)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                      </tr>
-                    </>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <DataTable
+            columns={columns}
+            data={entradasSaidasLista}
+            title="Tabela de Entradas e Saídas de Emprestimos"
+          />
         </Flex>
       </Box>
       <Footer />
     </Box>
   );
 };
-
 export default EntradasSaidas;

@@ -26,53 +26,244 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+var listaVolatel: any = [];
+import { createColumnHelper } from "@tanstack/react-table";
+import { DataTable } from "../components/TDataTableEntradaSaida/DataTable";
+type TodoItem = {
+  id: number;
+  bI: string;
+  nomeCompleto: string;
+  nUIT: string;
+  value: string;
+  contacto: string;
+  dataNascimento: string;
+  nacionalidade: string;
+  estadoCivil: string;
+  endereco: string;
+  fonteRendimento: string;
+  saldo: string;
+  status: string;
+  anexos: string;
+};
+const columnHelper = createColumnHelper<TodoItem>();
+const columns = [
+  columnHelper.accessor("nomeCompleto", {
+    cell: (info) => info.getValue(),
+    header: "Nome Completo",
+  }),
+  columnHelper.accessor("bI", {
+    cell: (info) => info.getValue(),
+    header: "Número de BI",
+  }),
+  columnHelper.accessor("nUIT", {
+    cell: (info) => info.getValue(),
+    header: "NUIT",
+  }),
+  columnHelper.accessor("contacto", {
+    cell: (info) => info.getValue(),
+    header: "Contacto",
+  }),
+  columnHelper.accessor("dataNascimento", {
+    cell: (info) => info.getValue(),
+    header: "Data de Nascimento",
+  }),
+  columnHelper.accessor("nacionalidade", {
+    cell: (info) => info.getValue(),
+    header: "Nacionalidade",
+  }),
+  columnHelper.accessor("estadoCivil", {
+    cell: (info) => info.getValue(),
+    header: "Estado Civil",
+  }),
+  columnHelper.accessor("endereco", {
+    cell: (info) => info.getValue(),
+    header: "Residência",
+  }),
+  columnHelper.accessor("fonteRendimento", {
+    cell: (info) => info.getValue(),
+    header: "Fonte de Rendimento",
+  }),
+  columnHelper.accessor("saldo", {
+    cell: (info) => info.getValue(),
+    header: "Emprestimo a Solicitado",
+  }),
+  columnHelper.accessor("anexos", {
+    cell: (info) => info.getValue(),
+    header: "Anexos",
+  }),
+  columnHelper.accessor("status", {
+    cell: (info) => info.getValue(),
+    header: "Status",
+  }),
+];
 
 function EmprestimosSolicitados() {
+  const router = useRouter();
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
-  const router = useRouter();
   const [emprestimoLista, setEmprestimoLista] = useState<any[]>([]);
   const [processando, setProcessando] = useState(false);
-  const [formularioEnviado, setFormularioEnviado] = useState(false);
-  const [nomeCompleto, setNomeCompleto] = useState("");
-  const [nomeCompletoAvalista, setNomeCompletoAvalista] = useState("");
-  const [bI, setBI] = useState("");
-  const [juro, setJuro] = useState("0");
-  const [bIAvalista, setBIAvalista] = useState("");
-  const [contacto, setContacto] = useState("");
-  const [contactoAvalista, setContactoAvalista] = useState("");
-  const [saldo, setSaldo] = useState("");
-  const [endereco, setEndereco] = useState("");
-  const [enderecoAvalista, setEnderecoAvalista] = useState("");
-  const [numeroQuarteirao, setNumeroQuarteirao] = useState("");
-  const [numeroQuarteiraoAvalista, setNumeroQuarteiraoAvalista] = useState("");
-  const [numeroCasa, setNumeroCasa] = useState("");
-  const [numeroCasaAvalista, setNumeroCasaAvalista] = useState("");
-  const [bairroAvalista, setBairroAvalista] = useState("");
-  const [bairro, setBairro] = useState("");
-  const [distrito, setDistrito] = useState("");
-  const [distritoAvalista, setDistritoAvalista] = useState("");
-  const [fonteRendimento, setFonteRendimento] = useState("");
-  const [garantias, setGarantias] = useState("");
-  const [genero2, setGenero2] = useState("");
-  const [genero2Avalista, setGenero2Avalista] = useState("");
-  const [nUIT, setNUIT] = useState("");
-  const [nUITAvalista, setNUITAvalista] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [dataNascimentoAvalista, setDataNascimentoAvalista] = useState("");
-  const [nacionalidade, setNacionalidade] = useState("");
-  const [nacionalidadeAvalista, setNacionalidadeAvalista] = useState("");
-  const [estadoCivil, setEstadoCivil] = useState("");
-  const [estadoCivilAvalista, setEstadoCivilAvalista] = useState("");
-  const [actualizado, setActualizado] = useState("");
-  const [status, setStatus] = useState(false);
   useEffect(() => {
+    listaVolatel = [];
     const fetchPosts = async () => {
       const response = await fetch(`/api/todosEmprestimos`, {
         cache: "no-store",
       });
       const data = await response.json();
-      setEmprestimoLista(data);
+      data.map((item: any) => {
+        var anexoT = item.anexos.map((anexo: any) => (
+          <>
+            {" "}
+            <Button
+              as={"a"}
+              fontSize={"sm"}
+              fontWeight={400}
+              variant={"link"}
+              href={anexo.link}
+            >
+              Anexo
+            </Button>{" "}
+            |
+          </>
+        ));
+        var statusT = item.status ? (
+          <>
+            <td>
+              Aprovado |{" "}
+              <Button
+                as={"a"}
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"red.400"}
+                onClick={() =>
+                  gerarPDF(
+                    item.nomeCompleto,
+                    item.nomeCompletoAvalista,
+                    item.bI,
+                    item.bIAvalista,
+                    item.contacto,
+                    item.contactoAvalista,
+                    item.saldo,
+                    item.endereco,
+                    item.enderecoAvalista,
+                    item.numeroQuarteirao,
+                    item.numeroQuarteiraoAvalista,
+                    item.numeroCasa,
+                    item.numeroCasaAvalista,
+                    item.bairro,
+                    item.bairroAvalista,
+                    item.distrito,
+                    item.distritoAvalista,
+                    item.fonteRendimento,
+                    item.garantias,
+                    item.genero2,
+                    item.genero2Avalista,
+                    item.nUIT,
+                    item.nUITAvalista,
+                    item.dataNascimento,
+                    item.dataNascimentoAvalista,
+                    item.nacionalidade,
+                    item.nacionalidadeAvalista,
+                    item.estadoCivil,
+                    item.estadoCivilAvalista,
+                    item.juro
+                  )
+                }
+                _hover={{
+                  bg: "blue.500",
+                }}
+              >
+                Contracto
+              </Button>
+              <Button
+                as={"a"}
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"blue.400"}
+                onClick={() => EditarEmp(item._id)}
+                _hover={{
+                  bg: "blue.500",
+                }}
+              >
+                Editar
+              </Button>
+            </td>
+          </>
+        ) : (
+          <>
+            <td>
+              <Button
+                as={"a"}
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"blue.400"}
+                onClick={() =>
+                  verLisa(
+                    item._id,
+                    item.nomeCompleto,
+                    item.nomeCompletoAvalista,
+                    item.bI,
+                    item.bIAvalista,
+                    item.contacto,
+                    item.contactoAvalista,
+                    item.saldo,
+                    item.endereco,
+                    item.enderecoAvalista,
+                    item.numeroQuarteirao,
+                    item.numeroQuarteiraoAvalista,
+                    item.numeroCasa,
+                    item.numeroCasaAvalista,
+                    item.bairro,
+                    item.bairroAvalista,
+                    item.distrito,
+                    item.distritoAvalista,
+                    item.fonteRendimento,
+                    item.garantias,
+                    item.genero2,
+                    item.genero2Avalista,
+                    item.nUIT,
+                    item.nUITAvalista,
+                    item.dataNascimento,
+                    item.dataNascimentoAvalista,
+                    item.nacionalidade,
+                    item.nacionalidadeAvalista,
+                    item.estadoCivil,
+                    item.estadoCivilAvalista
+                  )
+                }
+                _hover={{
+                  bg: "red.500",
+                }}
+              >
+                Aprovar Pedido
+              </Button>
+            </td>
+          </>
+        );
+        listaVolatel.push({
+          nomeCompleto: item.nomeCompleto,
+          bI: item.bI,
+          nUIT: item.nUIT,
+          contacto: item.contacto,
+          dataNascimento: item.dataNascimento,
+          nacionalidade: item.nacionalidade,
+          estadoCivil: item.estadoCivil,
+          endereco: item.endereco,
+          fonteRendimento: item.fonteRendimento,
+          saldo: `${parseFloat(item.saldo).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+          })} Mt`,
+          anexos: anexoT,
+          status: statusT,
+        });
+      });
+      setEmprestimoLista(listaVolatel);
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
@@ -408,7 +599,12 @@ function EmprestimosSolicitados() {
           >
             Emprestimos Solicitados
           </Heading>
-          <TableContainer>
+          <DataTable
+            columns={columns}
+            data={emprestimoLista}
+            title="Tabela dos Emprestimos Solicitados"
+          />
+          {/* <TableContainer>
             <Table variant="striped" colorScheme="teal">
               <TableCaption>DV Microcrédito</TableCaption>
               <Thead>
@@ -611,7 +807,7 @@ function EmprestimosSolicitados() {
                   ))}
               </Tbody>
             </Table>
-          </TableContainer>
+          </TableContainer> */}
         </Flex>
       </Box>
       <Footer />

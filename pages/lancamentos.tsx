@@ -5,15 +5,6 @@ import {
   Heading,
   Text,
   useColorMode,
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
   Stack,
   Button,
   Grid,
@@ -28,6 +19,29 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ExtractoPDF from "../components/ExtractoPDF";
+import { createColumnHelper } from "@tanstack/react-table";
+import { DataTable } from "../components/TDataTableEntradaSaida/DataTable";
+type TodoItem = {
+  createdAt: string;
+  nomeCompleto: string;
+  totalEmprestimo: string;
+  jurosEmprestimo: string;
+  multaDia: string;
+  totalParcelas: string;
+  totalParcelas2: string;
+  jurosMt: string;
+  dividaTotal: string;
+  multaDiaMt: string;
+  totalParcelasMt: string;
+  totalParcelas2Mt: string;
+  recAmort: string;
+  totalDivida: string;
+  recJuros: string;
+  atrasoVMt: string;
+  atrasoV: string;
+  value: string;
+};
+const columnHelper = createColumnHelper<TodoItem>();
 const Lancamentos = () => {
   const { colorMode } = useColorMode();
   const { data: session } = useSession();
@@ -121,14 +135,87 @@ const Lancamentos = () => {
 
           listaVolatel.push({
             nomeCompleto: item.nomeCompleto,
-            totalEmprestimo: item.totalEmprestimo,
-            jurosEmprestimo: item.jurosEmprestimo,
+            totalEmprestimo: `${parseFloat(item.totalEmprestimo).toLocaleString(
+              "en-US",
+              {
+                minimumFractionDigits: 2,
+              }
+            )}`,
+            jurosEmprestimo: `${item.jurosEmprestimo}%`,
+            jurosMt: `${(
+              (parseFloat(item.jurosEmprestimo) / 100) *
+              parseFloat(item.totalEmprestimo)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            dividaTotal: `${(
+              parseFloat(item.totalEmprestimo) +
+              (parseFloat(item.jurosEmprestimo) / 100) *
+                parseFloat(item.totalEmprestimo)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
             totalParcelas: item.totalParcelas,
+            totalParcelasMt: `${(
+              ((parseFloat(item.totalEmprestimo) +
+                (parseFloat(item.jurosEmprestimo) / 100) *
+                  parseFloat(item.totalEmprestimo)) /
+                parseFloat(item.totalParcelas)) *
+              parseFloat(item.totalParcelas2)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
             totalParcelas2: parcelasTT,
+            totalParcelas2Mt: `${(
+              ((parseFloat(item.totalEmprestimo) +
+                (parseFloat(item.jurosEmprestimo) / 100) *
+                  parseFloat(item.totalEmprestimo)) /
+                parseFloat(item.totalParcelas)) *
+              parcelasTT
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            recAmort: `${(
+              (parseFloat(item.totalEmprestimo) /
+                parseFloat(item.totalParcelas)) *
+              parcelasTT
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            recJuros: `${(
+              (((parseFloat(item.jurosEmprestimo) / 100) *
+                parseFloat(item.totalEmprestimo)) /
+                parseFloat(item.totalParcelas)) *
+              parcelasTT
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
             atraso: tAtraso,
             atrasoV: tAtrasoVV,
-            multaDia: item.multaDia,
-            createdAt: item.createdAt,
+            atrasoVMt: `${tAtrasoVV.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            multaDia: `${item.multaDia}%`,
+            totalDivida: `${(
+              parseFloat(item.totalEmprestimo) +
+              (parseFloat(item.jurosEmprestimo) / 100) *
+                parseFloat(item.totalEmprestimo) -
+              ((parseFloat(item.totalEmprestimo) +
+                (parseFloat(item.jurosEmprestimo) / 100) *
+                  parseFloat(item.totalEmprestimo)) /
+                parseFloat(item.totalParcelas)) *
+                parcelasTT +
+              tAtraso
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            multaDiaMt: `${(
+              (parseFloat(item.multaDia) / 100) *
+              parseFloat(item.totalEmprestimo)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}`,
+            createdAt: item.createdAt.substring(0, 10),
           });
         }
       });
@@ -143,6 +230,72 @@ const Lancamentos = () => {
     };
     if (session?.user) fetchPosts();
   }, [session?.user]);
+  const columns = [
+    columnHelper.accessor("createdAt", {
+      cell: (info) => info.getValue(),
+      header: "Data",
+    }),
+    columnHelper.accessor("nomeCompleto", {
+      cell: (info) => info.getValue(),
+      header: "Nome Cliente",
+    }),
+    columnHelper.accessor("totalEmprestimo", {
+      cell: (info) => info.getValue(),
+      header: "Empréstimo",
+    }),
+    columnHelper.accessor("jurosEmprestimo", {
+      cell: (info) => info.getValue(),
+      header: "Juros(%)",
+    }),
+    columnHelper.accessor("jurosMt", {
+      cell: (info) => info.getValue(),
+      header: "Juros(Mt)",
+    }),
+    columnHelper.accessor("dividaTotal", {
+      cell: (info) => info.getValue(),
+      header: "Dívida Total",
+    }),
+    columnHelper.accessor("multaDia", {
+      cell: (info) => info.getValue(),
+      header: "Multa % Dia",
+    }),
+    columnHelper.accessor("multaDiaMt", {
+      cell: (info) => info.getValue(),
+      header: "Multa (Mt) Dia",
+    }),
+    columnHelper.accessor("totalParcelas", {
+      cell: (info) => info.getValue(),
+      header: "Parcelas",
+    }),
+    columnHelper.accessor("totalParcelas2", {
+      cell: (info) => info.getValue(),
+      header: "P. Quitadas",
+    }),
+    columnHelper.accessor("totalParcelas2Mt", {
+      cell: (info) => info.getValue(),
+      header: "P. Quitadas(Mt)",
+    }),
+    columnHelper.accessor("recAmort", {
+      cell: (info) => info.getValue(),
+      header: "Rec. Amort",
+    }),
+    columnHelper.accessor("recJuros", {
+      cell: (info) => info.getValue(),
+      header: "Rec. Juros",
+    }),
+    columnHelper.accessor("atrasoV", {
+      cell: (info) => info.getValue(),
+      header: "T. Atraso",
+    }),
+    columnHelper.accessor("atrasoVMt", {
+      cell: (info) => info.getValue(),
+      header: "T. Atraso(Mt)",
+    }),
+    columnHelper.accessor("totalDivida", {
+      cell: (info) => info.getValue(),
+      header: "Dívida Actual",
+    }),
+  ];
   async function smsAtrasoFuntion() {
     toast(`O envio das sms's encontra-se temporariamente indisponível`, {
       position: "top-right",
@@ -405,204 +558,11 @@ const Lancamentos = () => {
           >
             Lançamentos
           </Heading>
-          <TableContainer>
-            <Table variant="striped" colorScheme="teal">
-              <TableCaption>DV Microcrédito</TableCaption>
-              <Thead>
-                <Tr>
-                  <th>
-                    <Box mx={4}>Data</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Nome Cliente</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Empréstimo</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Juros(%)</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Juros(Mt)</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Dívida Total</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Multa % Dia</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Multa (Mt) Dia</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Parcelas</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>P. Quitadas</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>P. Quitadas(Mt)</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Rec. Amort</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Rec. Juros</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>T. Atraso</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>T. Atraso(Mt)</Box>
-                  </th>
-                  <th>
-                    <Box mx={4}>Dívida Actual</Box>
-                  </th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {emprestimoLista.length > 0 &&
-                  emprestimoLista.map((ddf) => (
-                    <>
-                      <tr>
-                        <td>
-                          <Box mx={4}>{ddf.createdAt.substring(0, 10)}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.nomeCompleto}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {parseFloat(ddf.totalEmprestimo).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                              }
-                            )}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.jurosEmprestimo}%</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              (parseFloat(ddf.jurosEmprestimo) / 100) *
-                              parseFloat(ddf.totalEmprestimo)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              parseFloat(ddf.totalEmprestimo) +
-                              (parseFloat(ddf.jurosEmprestimo) / 100) *
-                                parseFloat(ddf.totalEmprestimo)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.multaDia}%</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              (parseFloat(ddf.multaDia) / 100) *
-                              parseFloat(ddf.totalEmprestimo)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.totalParcelas}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.totalParcelas2}</Box>
-                        </td>
-
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              ((parseFloat(ddf.totalEmprestimo) +
-                                (parseFloat(ddf.jurosEmprestimo) / 100) *
-                                  parseFloat(ddf.totalEmprestimo)) /
-                                parseFloat(ddf.totalParcelas)) *
-                              parseFloat(ddf.totalParcelas2)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              (parseFloat(ddf.totalEmprestimo) /
-                                parseFloat(ddf.totalParcelas)) *
-                              parseFloat(ddf.totalParcelas2)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              (((parseFloat(ddf.jurosEmprestimo) / 100) *
-                                parseFloat(ddf.totalEmprestimo)) /
-                                parseFloat(ddf.totalParcelas)) *
-                              parseFloat(ddf.totalParcelas2)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>{ddf.atrasoV}</Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {parseFloat(ddf.atraso).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                        <td>
-                          <Box mx={4}>
-                            {(
-                              parseFloat(ddf.totalEmprestimo) +
-                              (parseFloat(ddf.jurosEmprestimo) / 100) *
-                                parseFloat(ddf.totalEmprestimo) -
-                              ((parseFloat(ddf.totalEmprestimo) +
-                                (parseFloat(ddf.jurosEmprestimo) / 100) *
-                                  parseFloat(ddf.totalEmprestimo)) /
-                                parseFloat(ddf.totalParcelas)) *
-                                parseFloat(ddf.totalParcelas2) +
-                              parseFloat(ddf.atraso)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            Mt
-                          </Box>
-                        </td>
-                      </tr>
-                    </>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <DataTable
+            columns={columns}
+            data={emprestimoLista}
+            title="Tabela dos Lançamentos"
+          />
         </Flex>
       </Box>
       <Footer />
